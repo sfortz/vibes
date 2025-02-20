@@ -23,7 +23,7 @@ package be.vibes.ts.execution;
 import be.vibes.fexpression.FExpression;
 import be.vibes.solver.ConstraintIdentifier;
 import be.vibes.solver.FeatureModel;
-import be.vibes.solver.SolverFatalErrorException;
+import be.vibes.solver.exception.SolverFatalErrorException;
 import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverInitializationException;

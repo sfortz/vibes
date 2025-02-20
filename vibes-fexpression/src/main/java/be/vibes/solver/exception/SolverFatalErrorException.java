@@ -1,4 +1,4 @@
-package be.vibes.solver;
+package be.vibes.solver.exception;
 
 /*
  * #%L
@@ -19,7 +19,6 @@ package be.vibes.solver;
  * limitations under the License.
  * #L%
  */
-import be.vibes.solver.exception.ConstraintSolvingException;
 
 import java.io.Serial;
 

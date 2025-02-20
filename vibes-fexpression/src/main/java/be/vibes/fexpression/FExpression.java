@@ -41,11 +41,11 @@ public class FExpression {
     private Expression<Feature> expression;
 
     public static FExpression trueValue() {
-        return new FExpression(Literal.<Feature>of(true));
+        return new FExpression(Literal.of(true));
     }
 
     public static FExpression falseValue() {
-        return new FExpression(Literal.<Feature>of(false));
+        return new FExpression(Literal.of(false));
     }
 
     public static FExpression featureExpr(String name) {
@@ -198,26 +198,33 @@ public class FExpression {
     //Visitor Pattern
     public <E> E accept(FExpressionVisitorWithReturn<E> visitor) throws FExpressionException {
         Expression<Feature> exp = getExpression();
-        if (exp instanceof Literal) {
-            return visitor.constant(isTrue());
-        } else if (exp instanceof Variable) {
-            return visitor.feature(((Variable<Feature>) exp).getValue());
-        } else if (exp instanceof Not) {
-            return visitor.not(new FExpression(((Not<Feature>) exp).getE()));
-        } else if (exp instanceof And) {
-            List<FExpression> operands = Lists.newArrayList();
-            for (Expression<Feature> e : ((And<Feature>) exp).getChildren()) {
-                operands.add(new FExpression(e));
+
+        switch (exp) {
+            case Literal literal -> {
+                return visitor.constant(isTrue());
             }
-            return visitor.and(operands);
-        } else if (exp instanceof Or) {
-            List<FExpression> operands = Lists.newArrayList();
-            for (Expression<Feature> e : ((Or<Feature>) exp).getChildren()) {
-                operands.add(new FExpression(e));
+            case Variable<Feature> variable -> {
+                return visitor.feature(variable.getValue());
             }
-            return visitor.or(operands);
-        } else {
-            throw new IllegalStateException("Some FExpression elements have not been implemented in the visitor!");
+            case Not not -> {
+                return visitor.not(new FExpression(not.getE()));
+            }
+            case And and -> {
+                List<FExpression> operands = Lists.newArrayList();
+                for (Expression<Feature> e : exp.getChildren()) {
+                    operands.add(new FExpression(e));
+                }
+                return visitor.and(operands);
+            }
+            case Or or -> {
+                List<FExpression> operands = Lists.newArrayList();
+                for (Expression<Feature> e : exp.getChildren()) {
+                    operands.add(new FExpression(e));
+                }
+                return visitor.or(operands);
+            }
+            case null, default ->
+                    throw new IllegalStateException("Some FExpression elements have not been implemented in the visitor!");
         }
     }
 

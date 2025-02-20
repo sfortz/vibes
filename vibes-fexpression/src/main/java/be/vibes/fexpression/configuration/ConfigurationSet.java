@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.*;
 import be.vibes.fexpression.FExpression;
 import be.vibes.solver.ConstraintIdentifier;
-import be.vibes.solver.SolverFatalErrorException;
 import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverInitializationException;
