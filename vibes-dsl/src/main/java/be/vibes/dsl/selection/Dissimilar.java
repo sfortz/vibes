@@ -64,8 +64,7 @@ public class Dissimilar {
      * @return A partially configured algorithm.
      */
     public static Dissimilar from(TransitionSystem ts) {
-        Dissimilar diss = new Dissimilar(ts, null);
-        return diss;
+        return new Dissimilar(ts, null);
     }
 
     /**
@@ -78,8 +77,7 @@ public class Dissimilar {
      * @return A partially configured algorithm.
      */
     public static Dissimilar from(FeaturedTransitionSystem fts, FeatureModel fm) {
-        Dissimilar diss = new Dissimilar(fts, fm);
-        return diss;
+        return new Dissimilar(fts, fm);
     }
 
     /**

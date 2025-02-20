@@ -21,7 +21,7 @@ package be.vibes.fexpression;
  */
 public class Feature {
 
-    private String name;
+    private final String name;
 
     public Feature(String featureName) {
         this.name = featureName;

@@ -63,8 +63,8 @@ public class Sat4JSolverFacade implements FeatureModel, Iterator<Configuration> 
     private static final Logger logger = LoggerFactory.getLogger(Sat4JSolverFacade.class);
 
     private ISolver solver;
-    private DimacsModel model;
-    private Set<ConstraintIdentifier> deliveredIds = Sets.newHashSet();
+    private final DimacsModel model;
+    private final Set<ConstraintIdentifier> deliveredIds = Sets.newHashSet();
     
     public Sat4JSolverFacade(DimacsModel model) throws SolverInitializationException {
         this.model = model;
@@ -257,13 +257,13 @@ public class Sat4JSolverFacade implements FeatureModel, Iterator<Configuration> 
         ArrayList<Feature> sol = Lists.newArrayList();
         int[] m;
         m = this.solver.model();
-        for (int i = 0; i < m.length; i++) {
-            if (m[i] > 0) {
-                featureName = model.getFeatureMapping().inverse().get(m[i]);
+        for (int j : m) {
+            if (j > 0) {
+                featureName = model.getFeatureMapping().inverse().get(j);
                 if (featureName == null) {
                     logger.error(
                             "Feature number {} not found in mapping, will be replaces by null!",
-                            m[i]);
+                            j);
                 }
                 sol.add(Feature.feature(featureName));
             }

@@ -20,10 +20,8 @@ package be.vibes.ts.io.xml;
  * #L%
  */
 
-import be.vibes.solver.FeatureModel;
 import be.vibes.ts.exception.TransitionSystemDefinitionException;
 import be.vibes.ts.FeaturedTransitionSystem;
-import be.vibes.ts.TestSet;
 import be.vibes.ts.TransitionSystem;
 import be.vibes.ts.UsageModel;
 import java.io.File;
@@ -112,7 +110,7 @@ public class XmlLoaders {
             LOG.error("Error while reading TS!", e);
             throw new TransitionSystemDefinitionException("Error while reading TS!", e);
         }
-        return (FeaturedTransitionSystem) handler.geTransitionSystem();
+        return handler.geTransitionSystem();
     }
 
     /**

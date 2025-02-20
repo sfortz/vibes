@@ -78,8 +78,8 @@ public class DimacsModel {
         return new DimacsModel(fd);
     }
 
-    private ArrayList<int[]> dimacsFD;
-    private BiMap<String, Integer> featureMapping;
+    private final ArrayList<int[]> dimacsFD;
+    private final BiMap<String, Integer> featureMapping;
     private FExpression fd;
 
     private DimacsModel(FExpression fd) throws DimacsFormatException {

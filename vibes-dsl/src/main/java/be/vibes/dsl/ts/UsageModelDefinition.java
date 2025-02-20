@@ -49,8 +49,7 @@ public abstract class UsageModelDefinition extends AbstractTransitionSystemDefin
     
     @Override
     protected UsageModelTransitionDefinition from(String stateName) {
-        UsageModelTransitionDefinition def = new UsageModelTransitionDefinition(stateName, this);
-        return def;
+        return new UsageModelTransitionDefinition(stateName, this);
     }
 
     @Override

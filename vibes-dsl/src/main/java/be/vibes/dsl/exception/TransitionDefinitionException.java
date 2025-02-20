@@ -20,8 +20,11 @@ package be.vibes.dsl.exception;
  * #L%
  */
 
+import java.io.Serial;
+
 public class TransitionDefinitionException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -1487102928041544086L;
 
     public TransitionDefinitionException(String message) {

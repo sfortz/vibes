@@ -40,7 +40,7 @@ public class ConfigurationSet implements Set<Configuration> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSet.class);
 
-    private FeatureModel solver;
+    private final FeatureModel solver;
     private FExpression constraint;
 
     public ConfigurationSet(FeatureModel solver) {
@@ -70,8 +70,6 @@ public class ConfigurationSet implements Set<Configuration> {
             return (int) nbSolutions;
         } catch (ConstraintNotFoundException e) {
             logger.error("Error while removing constraint!", e);
-        } catch (SolverFatalErrorException e) {
-            logger.error("Error solving contraint!", e);
         } catch (SolverInitializationException e) {
             logger.error("Error Initializing solver!", e);
         } catch (ConstraintSolvingException e) {
@@ -98,8 +96,6 @@ public class ConfigurationSet implements Set<Configuration> {
         try {
             ConstraintIdentifier id = solver.addConstraint(constraint);
             return solver.getSolutions();
-        } catch (SolverFatalErrorException e) {
-            logger.error("Error solving contraint!", e);
         } catch (SolverInitializationException e) {
             logger.error("Error Initializing solver!", e);
         } catch (ConstraintSolvingException e) {

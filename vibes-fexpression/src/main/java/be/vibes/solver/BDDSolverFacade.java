@@ -48,11 +48,11 @@ public class BDDSolverFacade implements FeatureModel {
 
     private static final Logger logger = LoggerFactory.getLogger(BDDSolverFacade.class);
 
-    private BDDFactory factory;
-    private Map<String, BDD> featureMapping;
-    private BDD model;
-    private Map<ConstraintIdentifier, BDD> constraints;
-    private String[] featureNames;
+    private final BDDFactory factory;
+    private final Map<String, BDD> featureMapping;
+    private final BDD model;
+    private final Map<ConstraintIdentifier, BDD> constraints;
+    private final String[] featureNames;
 
     private BDD modelAndContraints = null;
 
@@ -85,7 +85,7 @@ public class BDDSolverFacade implements FeatureModel {
         }
         // Initialize feature variables
         int i = 0;
-        featureNames = features.toArray(new String[features.size()]);
+        featureNames = features.toArray(new String[0]);
         for (String name : featureNames) {
             this.featureMapping.put(name, this.factory.ithVar(i));
             i++;
@@ -99,11 +99,12 @@ public class BDDSolverFacade implements FeatureModel {
         }
     }
 
+    /*
     @Override
     protected void finalize() throws Throwable {
         this.factory.done();
         super.finalize();
-    }
+    }*/
 
     @Override
     public ConstraintIdentifier addConstraint(FExpression constraint)

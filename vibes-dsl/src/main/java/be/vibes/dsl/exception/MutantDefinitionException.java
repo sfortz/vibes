@@ -1,5 +1,7 @@
 package be.vibes.dsl.exception;
 
+import java.io.Serial;
+
 /*
  * #%L
  * vibes-dsl
@@ -21,6 +23,7 @@ package be.vibes.dsl.exception;
  */
 public class MutantDefinitionException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1390962869442667439L;
 
     public MutantDefinitionException(String message) {

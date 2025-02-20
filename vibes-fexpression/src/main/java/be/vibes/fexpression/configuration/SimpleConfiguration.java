@@ -35,7 +35,7 @@ import java.util.Iterator;
  */
 public class SimpleConfiguration implements Configuration {
 
-    private Set<Feature> features;
+    private final Set<Feature> features;
 
     /**
      * Creates a new simple configuration.
@@ -79,7 +79,7 @@ public class SimpleConfiguration implements Configuration {
 
     @Override
     public Feature[] getFeatures() {
-        return features.toArray(new Feature[features.size()]);
+        return features.toArray(new Feature[0]);
     }
 
     @Override
@@ -108,13 +108,8 @@ public class SimpleConfiguration implements Configuration {
         }
         SimpleConfiguration other = (SimpleConfiguration) obj;
         if (features == null) {
-            if (other.features != null) {
-                return false;
-            }
-        } else if (!features.equals(other.features)) {
-            return false;
-        }
-        return true;
+            return other.features == null;
+        } else return features.equals(other.features);
     }
 
 }

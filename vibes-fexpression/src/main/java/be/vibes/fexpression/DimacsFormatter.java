@@ -35,7 +35,7 @@ public class DimacsFormatter implements FExpressionVisitorWithReturn<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(DimacsFormatter.class);
 
-    private BiMap<String, Integer> featureMapping;
+    private final BiMap<String, Integer> featureMapping;
 
     private enum LastCallType {
 
@@ -46,7 +46,7 @@ public class DimacsFormatter implements FExpressionVisitorWithReturn<Object> {
 
     public static int[][] format(FExpression expression, BiMap<String, Integer> featureMapping) throws DimacsFormatException {
         DimacsFormatter form = new DimacsFormatter(featureMapping);
-        Object ret = null;
+        Object ret;
         try {
             FExpression cnf = expression.toCnf();
             logger.debug("CNF version of expression {} is {} ", expression, cnf);
@@ -55,18 +55,11 @@ public class DimacsFormatter implements FExpressionVisitorWithReturn<Object> {
         } catch (FExpressionException ex) {
             throw (DimacsFormatException) ex;
         }
-        switch (form.lastCall) {
-            case and:
-                return (int[][]) ret;
-            case or:
-                return new int[][]{(int[]) ret};
-            case not:
-                return new int[][]{new int[]{(int) ret}};
-            case feature:
-                return new int[][]{new int[]{(int) ret}};
-            default:
-                throw new DimacsFormatException("Should have called at least one DIMACS format rule!");
-        }
+        return switch (form.lastCall) {
+            case and -> (int[][]) ret;
+            case or -> new int[][]{(int[]) ret};
+            case not, feature -> new int[][]{new int[]{(int) ret}};
+        };
 
     }
 

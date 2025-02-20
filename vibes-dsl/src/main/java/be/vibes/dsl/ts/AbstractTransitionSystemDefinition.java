@@ -67,8 +67,7 @@ public abstract class AbstractTransitionSystemDefinition {
      * transition.
      */
     protected TransitionDefinition from(String stateName) {
-        TransitionDefinition def = new TransitionDefinition(stateName, this);
-        return def;
+        return new TransitionDefinition(stateName, this);
     }
 
     /**
@@ -79,8 +78,7 @@ public abstract class AbstractTransitionSystemDefinition {
      * state.
      */
     protected StateDefinition state(String stateName) {
-        StateDefinition def = new StateDefinition(stateName);
-        return def;
+        return new StateDefinition(stateName);
     }
 
     /**
@@ -92,8 +90,7 @@ public abstract class AbstractTransitionSystemDefinition {
      * action.
      */
     protected ActionDefinition action(String actionName) {
-        ActionDefinition def = new ActionDefinition(actionName);
-        return def;
+        return new ActionDefinition(actionName);
     }
 
     /**

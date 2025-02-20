@@ -1,5 +1,7 @@
 package be.vibes.solver.exception;
 
+import java.io.Serial;
+
 /*
  * #%L
  * VIBeS: featured expressions
@@ -21,6 +23,7 @@ package be.vibes.solver.exception;
  */
 public class SolverInitializationException extends ConstraintSolvingException {
 
+    @Serial
     private static final long serialVersionUID = -1339730190133503777L;
 
     public SolverInitializationException(String message, Throwable cause) {

@@ -165,9 +165,9 @@ public class DefaultTransitionSystem implements TransitionSystem {
         Preconditions.checkNotNull(source, "Source state may not be null!");
         Preconditions.checkNotNull(action, "Action may not be null!");
         Preconditions.checkNotNull(target, "Source target may not be null!");
-        Preconditions.checkArgument(states.values().contains(source), "Source state does not belong to this transition system!");
-        Preconditions.checkArgument(states.values().contains(target), "Target state does not belong to this transition system!");
-        Preconditions.checkArgument(actions.values().contains(action), "Action does not belong to this transition system!");
+        Preconditions.checkArgument(states.containsValue(source), "Source state does not belong to this transition system!");
+        Preconditions.checkArgument(states.containsValue(target), "Target state does not belong to this transition system!");
+        Preconditions.checkArgument(actions.containsValue(action), "Action does not belong to this transition system!");
         Iterator<Transition> it = getTransitions(source, action, target);
         Transition transition;
         if(it.hasNext()){
@@ -195,8 +195,8 @@ public class DefaultTransitionSystem implements TransitionSystem {
     void setLabel(State state, AtomicProposition prop){
         Preconditions.checkNotNull(state, "State may not be null!");
         Preconditions.checkNotNull(prop, "Prop may not be null!");
-        Preconditions.checkArgument(states.values().contains(state), "State does not belong to this transition system!");
-        Preconditions.checkArgument(propositions.values().contains(prop), "Prop does not belong to this transition system!");
+        Preconditions.checkArgument(states.containsValue(state), "State does not belong to this transition system!");
+        Preconditions.checkArgument(propositions.containsValue(prop), "Prop does not belong to this transition system!");
         this.labels.put(state, prop);
     }
 
@@ -222,14 +222,12 @@ public class DefaultTransitionSystem implements TransitionSystem {
 
     @Override
     public int getOutgoingCount(State source) {
-        return transitions.row(source).values().stream()
-                .collect(Collectors.summingInt(Set::size));
+        return transitions.row(source).values().stream().mapToInt(Set::size).sum();
     }
 
     @Override
     public int getIncomingCount(State target) {
-        return transitions.column(target).values().stream()
-                .collect(Collectors.summingInt(Set::size));
+        return transitions.column(target).values().stream().mapToInt(Set::size).sum();
     }
 
 }

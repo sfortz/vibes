@@ -96,7 +96,7 @@ public class TransitionSystemModelStatistics implements ModelStatistics {
         int height = 0;
         stateLevel.put(ts.getInitialState(), height);
         while (!toVisit.isEmpty()) {
-            State s = toVisit.remove(0);
+            State s = toVisit.removeFirst();
             Iterator<Transition> it = ts.getOutgoing(s);
             boolean levelAdd = false;
             while (it.hasNext()) {
@@ -198,12 +198,10 @@ public class TransitionSystemModelStatistics implements ModelStatistics {
     @Override
     public String getStatistics() {
         StringBuilder builder = new StringBuilder();
-        values.entrySet().forEach((e) -> {
-            builder.append(e.getKey())
-                    .append(" = ")
-                    .append(e.getValue())
-                    .append("\n");
-        });
+        values.forEach((key, value) -> builder.append(key)
+                .append(" = ")
+                .append(value)
+                .append("\n"));
         return builder.toString();
     }
 

@@ -68,8 +68,7 @@ public abstract class FeaturedTransitionSystemDefinition extends
 
     @Override
     protected FeaturedTransitionDefinition from(String stateName) {
-        FeaturedTransitionDefinition def = new FeaturedTransitionDefinition(stateName, this);
-        return def;
+        return new FeaturedTransitionDefinition(stateName, this);
     }
     
 }

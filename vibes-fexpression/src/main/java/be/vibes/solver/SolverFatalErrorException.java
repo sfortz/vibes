@@ -21,8 +21,11 @@ package be.vibes.solver;
  */
 import be.vibes.solver.exception.ConstraintSolvingException;
 
+import java.io.Serial;
+
 public class SolverFatalErrorException extends ConstraintSolvingException {
 
+    @Serial
     private static final long serialVersionUID = -2325925323317474526L;
 
     public SolverFatalErrorException(String arg0, Throwable arg1) {
