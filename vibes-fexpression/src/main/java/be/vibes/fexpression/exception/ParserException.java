@@ -1,5 +1,7 @@
 package be.vibes.fexpression.exception;
 
+import java.io.Serial;
+
 /*
  * #%L
  * VIBeS: featured expressions
@@ -21,6 +23,7 @@ package be.vibes.fexpression.exception;
  */
 public class ParserException extends FExpressionException {
 
+    @Serial
     private static final long serialVersionUID = -688083545446116008L;
 
     public ParserException(String message, Throwable cause) {

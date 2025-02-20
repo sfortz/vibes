@@ -36,9 +36,9 @@ public class MainTest {
     @Test
     public void testMain() throws Exception {
         String input = getClass().getClassLoader().getResource("minepump.ts").getFile();
-        File output = testFolder.newFile();
+        File output = testFolder.newFile("output.ts");
         output.delete();
-        File mapping = testFolder.newFile();
+        File mapping = testFolder.newFile("mapping.ts");
         mapping.delete();
         String[] args = new String[]{"-lts", input, "-out", output.getAbsolutePath(), "-" + DOTTransformator.OPTION_NAME};
         Main main = new Main();

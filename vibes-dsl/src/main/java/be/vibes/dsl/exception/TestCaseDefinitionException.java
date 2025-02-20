@@ -1,5 +1,7 @@
 package be.vibes.dsl.exception;
 
+import java.io.Serial;
+
 /*
  * #%L
  * vibes-dsl
@@ -21,6 +23,7 @@ package be.vibes.dsl.exception;
  */
 public class TestCaseDefinitionException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 728283401464210235L;
 
     public TestCaseDefinitionException(String message) {

@@ -30,7 +30,7 @@ package be.vibes.dsl.ts;
  */
 public class ActionDefinition {
 
-    private String actionName;
+    private final String actionName;
 
     ActionDefinition(String actionName) {
         this.actionName = actionName;

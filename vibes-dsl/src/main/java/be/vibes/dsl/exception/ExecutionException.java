@@ -20,8 +20,11 @@ package be.vibes.dsl.exception;
  * #L%
  */
 
+import java.io.Serial;
+
 public class ExecutionException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -3684120337851112981L;
 
     public ExecutionException(String message, Throwable cause) {

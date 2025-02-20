@@ -20,6 +20,7 @@ package be.vibes.dsl.test;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -52,9 +53,7 @@ public class TestCaseDefinition {
      * @return This.
      */
     public TestCaseDefinition action(String... actionNames) {
-        for (String name : actionNames) {
-            actions.add(name);
-        }
+        actions.addAll(Arrays.asList(actionNames));
         return this;
     }
 

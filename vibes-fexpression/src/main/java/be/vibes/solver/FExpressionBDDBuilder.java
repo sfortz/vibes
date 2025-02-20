@@ -33,8 +33,8 @@ import java.util.List;
 
 public class FExpressionBDDBuilder implements FExpressionVisitorWithReturn<BDD> {
 
-    private BDDFactory factory;
-    private Map<String, BDD> featureMapping;
+    private final BDDFactory factory;
+    private final Map<String, BDD> featureMapping;
 
     public FExpressionBDDBuilder(BDDFactory factory, Map<String, BDD> featureMapping) {
         this.factory = factory;

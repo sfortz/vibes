@@ -44,6 +44,11 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>txw2</artifactId>
+            <version>${txw2.version}</version>
+        </dependency>
     </dependencies>
 	
 </project>

@@ -29,7 +29,7 @@ package be.vibes.dsl.ts;
  */
 public class StateDefinition {
 
-    private String stateName;
+    private final String stateName;
 
     StateDefinition(String stateName) {
         this.stateName = stateName;

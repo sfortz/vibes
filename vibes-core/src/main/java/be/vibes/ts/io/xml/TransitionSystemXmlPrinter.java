@@ -28,13 +28,12 @@ import java.io.OutputStream;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
 public class TransitionSystemXmlPrinter {
 
     protected OutputStream output;
-
-    private TransitionSystemElementPrinter tsPrinter;
+    private final TransitionSystemElementPrinter tsPrinter;
 
     public TransitionSystemXmlPrinter(OutputStream output, TransitionSystemElementPrinter tsPrinter) {
         this.output = output;
@@ -50,9 +49,11 @@ public class TransitionSystemXmlPrinter {
     }
 
     public void print(TransitionSystem ts) throws XMLStreamException {
+
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        XMLStreamWriter xtw = xof.createXMLStreamWriter(this.output);
-        xtw.writeStartDocument("1.0");
+        IndentingXMLStreamWriter xtw = new IndentingXMLStreamWriter(xof.createXMLStreamWriter(this.output));
+        xtw.setIndentStep("    ");
+        xtw.writeStartDocument("UTF-8","1.0");
         this.tsPrinter.printElement(xtw, ts);
         xtw.writeEndDocument();
         xtw.flush();

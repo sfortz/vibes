@@ -26,9 +26,9 @@ public abstract class StructuralCoverage<T> implements CoverageCriteria {
 
     private static final Logger LOG = LoggerFactory.getLogger(StructuralCoverage.class);
 
-    private TransitionSystem ts;
-    private TransitionSystemExecutor executor;
-    private Set<T> elementsToCover;
+    private final TransitionSystem ts;
+    private final TransitionSystemExecutor executor;
+    private final Set<T> elementsToCover;
 
     /**
      * Create a new structural coverage criteria for the given transition system.
@@ -73,9 +73,8 @@ public abstract class StructuralCoverage<T> implements CoverageCriteria {
 
     @Override
     public double coverage(Execution execution){
-        Set<T> covered = new HashSet<>();
         double total = this.elementsToCover.size();
-        covered.addAll(getCoveredElements(execution));
+        Set<T> covered = new HashSet<>(getCoveredElements(execution));
         return total == 0.0 ? 0.0 : (covered.size() / total);
     }
 

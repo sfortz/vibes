@@ -184,10 +184,9 @@ public class FExpression {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FExpression)) {
+        if (!(obj instanceof FExpression other)) {
             return false;
         }
-        final FExpression other = (FExpression) obj;
         return Objects.equals(this.expression, other.expression);
     }
 
