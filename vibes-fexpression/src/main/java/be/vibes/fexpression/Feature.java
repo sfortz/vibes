@@ -36,4 +36,9 @@ public class Feature extends de.vill.model.Feature {
         return new Feature(name);
     }
 
+    @Override
+    public String toString() {
+        return super.getFeatureName();
+    }
+
 }
