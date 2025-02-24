@@ -20,6 +20,7 @@ package be.vibes.solver;
  * #L%
  */
 import java.util.Iterator;
+import java.util.Map;
 
 import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.configuration.Configuration;
@@ -67,6 +68,24 @@ public class FeatureModel extends de.vill.model.FeatureModel {
     @Override
     public Feature getRootFeature() {
         return Feature.clone(super.getRootFeature());
+    }
+
+    public Feature getFeature(String name) {
+        if (name == null) {
+            return null;
+        }
+
+        // Normalize input name to lowercase
+        //String lowerCaseName = name.toLowerCase();
+
+        // Find matching feature in a case-insensitive way
+        for (Map.Entry<String, de.vill.model.Feature> entry : this.getFeatureMap().entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
+                return Feature.clone(entry.getValue());
+            }
+        }
+
+        return null; // Return null if no match is found
     }
 
     /**
