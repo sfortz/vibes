@@ -27,7 +27,7 @@ import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverFatalErrorException;
 import be.vibes.solver.exception.SolverInitializationException;
-import de.vill.model.Feature;
+import be.vibes.fexpression.Feature;
 
 public class FeatureModel extends de.vill.model.FeatureModel {
 
@@ -46,6 +46,7 @@ public class FeatureModel extends de.vill.model.FeatureModel {
         this.getLiteralConstraints().addAll(featureModel.getLiteralConstraints());
         this.getLiteralExpressions().addAll(featureModel.getLiteralExpressions());
         this.getAggregateFunctionsWithRootFeature().addAll(featureModel.getAggregateFunctionsWithRootFeature());
+        this.solver = solver;
     }
 
 
@@ -58,11 +59,16 @@ public class FeatureModel extends de.vill.model.FeatureModel {
      * @param: rootFeature – the root feature
      */
     @Override
-    public void setRootFeature(Feature rootFeature) {
+    public void setRootFeature(de.vill.model.Feature rootFeature) {
         super.setRootFeature(rootFeature);
         // TODO: Change the solver by getting the root feature Feature Diagram.
     }
-    
+
+    @Override
+    public Feature getRootFeature() {
+        return Feature.clone(super.getRootFeature());
+    }
+
     /**
      * @param constraint
      * @return

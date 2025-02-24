@@ -1,5 +1,7 @@
 package be.vibes.fexpression;
 
+import de.vill.model.Group;
+
 /*
  * #%L
  * VIBeS: featured expressions
@@ -39,6 +41,34 @@ public class Feature extends de.vill.model.Feature {
     @Override
     public String toString() {
         return super.getFeatureName();
+    }
+
+    @Override
+    public Feature getParentFeature() {
+        de.vill.model.Feature parent = super.getParentFeature();
+        if (parent == null){
+            return null;
+        } else {
+            return clone(parent);
+        }
+    }
+
+    public static Feature clone(de.vill.model.Feature old) {
+        Feature feature = new Feature(old.getFeatureName());
+        feature.setNameSpace(old.getNameSpace());
+        feature.setLowerBound(old.getLowerBound());
+        feature.setUpperBound(old.getUpperBound());
+        feature.setSubmodelRoot(old.isSubmodelRoot());
+        feature.setRelatedImport(old.getRelatedImport());
+        feature.setFeatureType(old.getFeatureType());
+        feature.getAttributes().putAll(old.getAttributes());
+        for (Group group : old.getChildren()) {
+            feature.getChildren().add(group.clone());
+        }
+        for (Group group : feature.getChildren()) {
+            group.setParentFeature(feature);
+        }
+        return feature;
     }
 
 }
