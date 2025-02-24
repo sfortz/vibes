@@ -70,6 +70,7 @@ public class Feature extends de.vill.model.Feature {
         for (Group group : feature.getChildren()) {
             group.setParentFeature(feature);
         }
+        feature.setParentGroup(old.getParentGroup());
         return feature;
     }
 
