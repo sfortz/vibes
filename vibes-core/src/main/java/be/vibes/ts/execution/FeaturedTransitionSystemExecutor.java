@@ -23,6 +23,7 @@ package be.vibes.ts.execution;
 import be.vibes.fexpression.FExpression;
 import be.vibes.solver.ConstraintIdentifier;
 import be.vibes.solver.FeatureModel;
+import be.vibes.solver.SolverFacade;
 import be.vibes.solver.exception.SolverFatalErrorException;
 import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
@@ -44,9 +45,14 @@ public class FeaturedTransitionSystemExecutor extends TransitionSystemExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeaturedTransitionSystemExecutor.class);
 
-    private final FeatureModel fm;
+    private final SolverFacade fm;
 
     public FeaturedTransitionSystemExecutor(FeaturedTransitionSystem fts, FeatureModel fm) {
+        super(fts);
+        this.fm = fm.getSolver();
+    }
+
+    public FeaturedTransitionSystemExecutor(FeaturedTransitionSystem fts, SolverFacade fm) {
         super(fts);
         this.fm = fm;
     }

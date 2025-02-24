@@ -23,7 +23,7 @@ package be.vibes.dsl.selection;
 import be.vibes.dsl.exception.TestCaseDefinitionException;
 import be.vibes.selection.dissimilar.*;
 import be.vibes.selection.exception.TestCaseSelectionException;
-import be.vibes.solver.FeatureModel;
+import be.vibes.solver.SolverFacade;
 import be.vibes.ts.FeaturedTransitionSystem;
 import be.vibes.ts.TestSet;
 import be.vibes.ts.TransitionSystem;
@@ -46,12 +46,12 @@ public class Dissimilar {
     private static final Logger LOG = LoggerFactory.getLogger(Dissimilar.class);
 
     private final TransitionSystem ts;
-    private final FeatureModel fm;
+    private final SolverFacade fm;
     private PrioritizationTechnique prior;
     private int nbrTestCases = DissimilarTestCaseSelector.DEFAULT_NUMBER_OF_TEST_CASES;
     private long runningTime = DissimilarTestCaseSelector.DEFAULT_RUNNING_TIME_MILLI;
 
-    private Dissimilar(TransitionSystem ts, FeatureModel fm) {
+    private Dissimilar(TransitionSystem ts, SolverFacade fm) {
         this.ts = ts;
         this.fm = fm;
     }
@@ -76,7 +76,7 @@ public class Dissimilar {
      * given FTS.
      * @return A partially configured algorithm.
      */
-    public static Dissimilar from(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public static Dissimilar from(FeaturedTransitionSystem fts, SolverFacade fm) {
         return new Dissimilar(fts, fm);
     }
 
@@ -268,7 +268,7 @@ public class Dissimilar {
      * @return A dissimilarity computer to use in method withLocalMaxDistance or
      * withGlobalMaxDistance.
      */
-    public static FtsTestCaseDissimilarityComputor ftsDissimilarity(FeatureModel fm, TestCaseDissimilarityComputor computor) {
+    public static FtsTestCaseDissimilarityComputor ftsDissimilarity(SolverFacade fm, TestCaseDissimilarityComputor computor) {
         return new FtsTestCaseDissimilarityComputor(null, computor, null);
     }
 
@@ -288,7 +288,7 @@ public class Dissimilar {
      * @return A dissimilarity computer to use in method withLocalMaxDistance or
      * withGlobalMaxDistance.
      */
-    public static FtsTestCaseDissimilarityComputor ftsDissimilarity(FeatureModel fm, TestCaseDissimilarityComputor computor, BinaryOperator<Double> combineOperator) {
+    public static FtsTestCaseDissimilarityComputor ftsDissimilarity(SolverFacade fm, TestCaseDissimilarityComputor computor, BinaryOperator<Double> combineOperator) {
         return new FtsTestCaseDissimilarityComputor(null, computor, combineOperator, null);
     }
 

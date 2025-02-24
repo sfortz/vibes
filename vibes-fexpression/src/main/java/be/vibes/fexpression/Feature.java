@@ -19,55 +19,21 @@ package be.vibes.fexpression;
  * limitations under the License.
  * #L%
  */
-public class Feature {
+public class Feature extends de.vill.model.Feature {
 
-    private final String name;
-
+    /**
+     * The constructor of the feature class. Needs a name that can not be changed.
+     * The name is independent of the namespace. See
+     * {@link Feature#getFeatureName()} for further explanation.
+     *
+     * @param featureName The name of the feature (without namespace information)
+     */
     public Feature(String featureName) {
-        this.name = featureName;
+        super(featureName);
     }
 
     public static Feature feature(String name) {
         return new Feature(name);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Feature other = (Feature) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
     }
 
 }

@@ -87,7 +87,7 @@ public class DimacsModel {
         featureMapping = HashBiMap.create();
         int i = 1;
         for (Feature f : fd.getFeatures()) {
-            featureMapping.put(f.getName(), i);
+            featureMapping.put(f.getFeatureName(), i);
             i++;
         }
         dimacsFD = Lists.newArrayList();

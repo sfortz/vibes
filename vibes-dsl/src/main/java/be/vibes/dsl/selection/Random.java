@@ -27,6 +27,7 @@ import be.vibes.selection.random.LocalRandomTestCaseSelector;
 import be.vibes.selection.random.RandomTestCaseSelector;
 import be.vibes.selection.random.UsageDrivenRandomSelector;
 import be.vibes.solver.FeatureModel;
+import be.vibes.solver.SolverFacade;
 import be.vibes.ts.*;
 
 import java.util.Set;
@@ -90,7 +91,7 @@ public class Random {
      * @return A set of DEFAULT_TESTSUITE_SIZE random test cases with a maximal length of
      * RandomTestCaseSelector.DEFAULT_MAX_LENGTH.
      */
-    public static TestSet randomSelection(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public static TestSet randomSelection(FeaturedTransitionSystem fts, SolverFacade fm) {
         return randomSelection(fts, fm, DEFAULT_TESTSUITE_SIZE);
     }
 
@@ -102,7 +103,7 @@ public class Random {
      * @param nbrTestCases The number of test cases to select.
      * @return A set of random test cases with a maximal length of RandomTestCaseSelector.DEFAULT_MAX_LENGTH.
      */
-    public static TestSet randomSelection(FeaturedTransitionSystem fts, FeatureModel fm, int nbrTestCases) {
+    public static TestSet randomSelection(FeaturedTransitionSystem fts, SolverFacade fm, int nbrTestCases) {
         return randomSelection(fts, fm, nbrTestCases, RandomTestCaseSelector.DEFAULT_MAX_LENGTH);
     }
 
@@ -115,7 +116,7 @@ public class Random {
      * @param testCaseMaxLength The maximal length of the test cases.
      * @return A set of random test cases.
      */
-    public static TestSet randomSelection(FeaturedTransitionSystem fts, FeatureModel fm, int nbrTestCases, int testCaseMaxLength) {
+    public static TestSet randomSelection(FeaturedTransitionSystem fts, SolverFacade fm, int nbrTestCases, int testCaseMaxLength) {
         FtsRandomTestCaseSelector selector = new FtsRandomTestCaseSelector(fts, fm, testCaseMaxLength);
         try {
             return new TestSet(selector.select(nbrTestCases));

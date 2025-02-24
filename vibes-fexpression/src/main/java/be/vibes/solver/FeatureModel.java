@@ -25,54 +25,94 @@ import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.configuration.Configuration;
 import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
+import be.vibes.solver.exception.SolverFatalErrorException;
 import be.vibes.solver.exception.SolverInitializationException;
+import de.vill.model.Feature;
 
-public interface FeatureModel {
+public class FeatureModel extends de.vill.model.FeatureModel {
+
+    private SolverFacade solver;
+
+    protected FeatureModel(de.vill.model.FeatureModel featureModel, SolverFacade solver) {
+        super();
+        this.getUsedLanguageLevels().addAll(featureModel.getUsedLanguageLevels());
+        this.setNamespace(featureModel.getNamespace());
+        this.getImports().addAll(featureModel.getImports());
+        this.setRootFeature(featureModel.getRootFeature());
+        this.getFeatureMap().putAll(featureModel.getFeatureMap());
+        this.getImports().addAll(featureModel.getImports());
+        this.getOwnConstraints().addAll(featureModel.getOwnConstraints());
+        this.setExplicitLanguageLevels(featureModel.isExplicitLanguageLevels());
+        this.getLiteralConstraints().addAll(featureModel.getLiteralConstraints());
+        this.getLiteralExpressions().addAll(featureModel.getLiteralExpressions());
+        this.getAggregateFunctionsWithRootFeature().addAll(featureModel.getAggregateFunctionsWithRootFeature());
+    }
+
+
+    public SolverFacade getSolver() {
+        return solver;
+    }
 
     /**
-     *
+     * Set the root feature of the feature model
+     * @param: rootFeature – the root feature
+     */
+    @Override
+    public void setRootFeature(Feature rootFeature) {
+        super.setRootFeature(rootFeature);
+        // TODO: Change the solver by getting the root feature Feature Diagram.
+    }
+    
+    /**
      * @param constraint
      * @return
      * @throws SolverInitializationException If the constraint could not be
-     * added to the solver. Exact reason depends on implementation.
-     * @throws SolverFatalErrorException If the solver encounter an error he
-     * could not recover from. Solver should be reset when this exception is
-     * launched
+     *                                       added to the solver. Exact reason depends on implementation.
+     * @throws SolverFatalErrorException     If the solver encounter an error he
+     *                                       could not recover from. Solver should be reset when this exception is
+     *                                       launched
      */
-    public ConstraintIdentifier addConstraint(FExpression constraint)
-            throws SolverInitializationException, SolverFatalErrorException;
+    public ConstraintIdentifier addSolverConstraint(FExpression constraint)
+            throws SolverInitializationException, SolverFatalErrorException {
+        return this.solver.addConstraint(constraint);
+    }
 
     /**
-     *
      * @param id
-     * @throws SolverFatalErrorException If the solver encounter an error it
-     * could not recover from. Solver should be reset when this exception is
-     * launched.
+     * @throws SolverFatalErrorException                             If the solver encounter an error it
+     *                                                               could not recover from. Solver should be reset when this exception is
+     *                                                               launched.
      * @throws be.vibes.solver.exception.ConstraintNotFoundException
      */
-    public void removeConstraint(ConstraintIdentifier id)
-            throws SolverFatalErrorException, ConstraintNotFoundException;
+    public void removeSolverConstraint(ConstraintIdentifier id)
+            throws SolverFatalErrorException, ConstraintNotFoundException {
+        this.solver.removeConstraint(id);
+    }
 
     /**
-     *
      * @return @throws ConstraintSolvingException
      */
-    public boolean isSatisfiable() throws ConstraintSolvingException;
+    public boolean isSatisfiable() throws ConstraintSolvingException {
+        return this.solver.isSatisfiable();
+    }
 
     /**
-     *
      * @return @throws ConstraintSolvingException
      */
-    public Iterator<Configuration> getSolutions() throws ConstraintSolvingException;
+    public Iterator<Configuration> getSolutions() throws ConstraintSolvingException {
+        return this.solver.getSolutions();
+    }
 
     /**
      * Reset the state of the solver. This method should be used only if the
      * solver is in an inconsistant state.
      *
      * @throws SolverInitializationException If an error occurs during the
-     * reseting of the solver.
+     *                                       reseting of the solver.
      */
-    public void reset() throws SolverInitializationException;
+    public void resetSolver() throws SolverInitializationException {
+        this.solver.reset();
+    }
 
     /**
      * Returns the number of solutions.
@@ -80,6 +120,8 @@ public interface FeatureModel {
      * @return
      * @throws be.vibes.solver.exception.ConstraintSolvingException
      */
-    public double getNumberOfSolutions() throws ConstraintSolvingException;
+    public double getNumberOfSolutions() throws ConstraintSolvingException {
+        return this.solver.getNumberOfSolutions();
+    }
 
 }

@@ -24,6 +24,7 @@ import be.vibes.fexpression.FExpression;
 import be.vibes.selection.exception.SinkStateReachedException;
 import be.vibes.solver.ConstraintIdentifier;
 import be.vibes.solver.FeatureModel;
+import be.vibes.solver.SolverFacade;
 import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverInitializationException;
 import be.vibes.ts.FeaturedTransitionSystem;
@@ -45,20 +46,20 @@ public class FtsRandomTestCaseSelector extends RandomTestCaseSelector {
 
     private static final Logger LOG = LoggerFactory.getLogger(FtsRandomTestCaseSelector.class);
 
-    private final FeatureModel fm;
+    private final SolverFacade fm;
     private final FeaturedTransitionSystemExecutor exec;
 
-    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, FeatureModel fm, int maxNbrTry, int maxLength) {
+    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, SolverFacade fm, int maxNbrTry, int maxLength) {
         super(fts, maxNbrTry, maxLength);
         this.fm = fm;
         this.exec = new FeaturedTransitionSystemExecutor(fts, fm);
     }
 
-    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, SolverFacade fm) {
         this(fts, fm, DEFAULT_MAX_NUMBER_TRY, DEFAULT_MAX_LENGTH);
     }
     
-    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, FeatureModel fm, int maxLength) {
+    public FtsRandomTestCaseSelector(FeaturedTransitionSystem fts, SolverFacade fm, int maxLength) {
         this(fts, fm, DEFAULT_MAX_NUMBER_TRY, maxLength);
     }
 

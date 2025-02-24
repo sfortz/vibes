@@ -21,13 +21,13 @@ package be.vibes.selection.dissimilar;
  */
 
 import be.vibes.fexpression.FExpression;
+import be.vibes.solver.SolverFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.*;
 import be.vibes.selection.exception.DissimilarityComputationException;
 import be.vibes.solver.ConstraintIdentifier;
-import be.vibes.solver.FeatureModel;
 import be.vibes.solver.exception.SolverFatalErrorException;
 import be.vibes.solver.exception.ConstraintNotFoundException;
 import be.vibes.solver.exception.ConstraintSolvingException;
@@ -45,34 +45,34 @@ public class FtsTestCaseDissimilarityComputor extends TestCaseDissimilarityCompu
             .getLogger(FtsTestCaseDissimilarityComputor.class);
 
     private final TestCaseDissimilarityComputor testCaseDissimilarity;
-    private FeatureModel fm;
+    private SolverFacade fm;
     private final BinaryOperator<Double> combineOperator;
     private FeaturedTransitionSystem fts;
 
-    public FtsTestCaseDissimilarityComputor(FeatureModel solver, FeaturedTransitionSystem fts) {
+    public FtsTestCaseDissimilarityComputor(SolverFacade solver, FeaturedTransitionSystem fts) {
         this(solver, new JaccardDissimilarityComputor(), fts);
     }
 
-    public FtsTestCaseDissimilarityComputor(FeatureModel solver, TestCaseDissimilarityComputor computor, FeaturedTransitionSystem fts) {
+    public FtsTestCaseDissimilarityComputor(SolverFacade solver, TestCaseDissimilarityComputor computor, FeaturedTransitionSystem fts) {
         this(solver, computor, (Double x, Double y) -> x * y, fts);
     }
 
-    public FtsTestCaseDissimilarityComputor(FeatureModel solver, TestCaseDissimilarityComputor computor, BinaryOperator<Double> combineOperator, FeaturedTransitionSystem fts) {
+    public FtsTestCaseDissimilarityComputor(SolverFacade solver, TestCaseDissimilarityComputor computor, BinaryOperator<Double> combineOperator, FeaturedTransitionSystem fts) {
         this.fm = solver;
         this.testCaseDissimilarity = computor;
         this.combineOperator = combineOperator;
         this.fts = fts;
     }
 
-    public FtsTestCaseDissimilarityComputor(FeatureModel solver, SetBasedDissimilarityComputor<? extends Set> computor, FeaturedTransitionSystem fts) {
+    public FtsTestCaseDissimilarityComputor(SolverFacade solver, SetBasedDissimilarityComputor<? extends Set> computor, FeaturedTransitionSystem fts) {
         this(solver, TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(computor), fts);
     }
 
-    public FtsTestCaseDissimilarityComputor(FeatureModel solver, SequenceBasedDissimilarityComputor<? extends List> computor, FeaturedTransitionSystem fts) {
+    public FtsTestCaseDissimilarityComputor(SolverFacade solver, SequenceBasedDissimilarityComputor<? extends List> computor, FeaturedTransitionSystem fts) {
         this(solver, TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(computor), fts);
     }
 
-    public void setFm(FeatureModel fm) {
+    public void setFm(SolverFacade fm) {
         this.fm = fm;
     }
 

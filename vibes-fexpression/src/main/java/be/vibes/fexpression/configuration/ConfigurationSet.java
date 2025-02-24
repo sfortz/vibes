@@ -63,9 +63,9 @@ public class ConfigurationSet implements Set<Configuration> {
     @Override
     public int size() {
         try {
-            ConstraintIdentifier id = solver.addConstraint(constraint);
+            ConstraintIdentifier id = solver.addSolverConstraint(constraint);
             double nbSolutions = solver.getNumberOfSolutions();
-            solver.removeConstraint(id);
+            solver.removeSolverConstraint(id);
             return (int) nbSolutions;
         } catch (ConstraintNotFoundException e) {
             logger.error("Error while removing constraint!", e);
@@ -93,7 +93,7 @@ public class ConfigurationSet implements Set<Configuration> {
     @Override
     public Iterator<Configuration> iterator() {
         try {
-            ConstraintIdentifier id = solver.addConstraint(constraint);
+            ConstraintIdentifier id = solver.addSolverConstraint(constraint);
             return solver.getSolutions();
         } catch (SolverInitializationException e) {
             logger.error("Error Initializing solver!", e);

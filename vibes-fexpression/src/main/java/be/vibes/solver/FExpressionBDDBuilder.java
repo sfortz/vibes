@@ -52,7 +52,7 @@ public class FExpressionBDDBuilder implements FExpressionVisitorWithReturn<BDD> 
 
     @Override
     public BDD feature(Feature feature) {
-        BDD featBdd = this.featureMapping.get(feature.getName());
+        BDD featBdd = this.featureMapping.get(feature.getFeatureName());
         checkNotNull(featBdd, "Feature %s not found in feature to BDD mapping!", feature);
         return featBdd;
     }

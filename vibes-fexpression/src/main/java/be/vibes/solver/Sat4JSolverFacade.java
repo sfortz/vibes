@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import be.vibes.solver.exception.SolverFatalErrorException;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.minisat.core.Solver;
@@ -58,7 +59,7 @@ import be.vibes.solver.exception.SolverInitializationException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class Sat4JSolverFacade implements FeatureModel, Iterator<Configuration> {
+public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> {
 
     private static final Logger logger = LoggerFactory.getLogger(Sat4JSolverFacade.class);
 

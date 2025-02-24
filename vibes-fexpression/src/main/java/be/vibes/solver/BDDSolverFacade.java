@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import be.vibes.solver.exception.SolverFatalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverInitializationException;
 import static com.google.common.base.Preconditions.*;
 
-public class BDDSolverFacade implements FeatureModel {
+public class BDDSolverFacade implements SolverFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(BDDSolverFacade.class);
 
@@ -60,6 +61,10 @@ public class BDDSolverFacade implements FeatureModel {
         this(model.getFeatures(), model.getFd());
     }
 
+    public BDDSolverFacade(FExpression featureDiagram) {
+        this(featureDiagram.getFeatures().stream().map(Feature::getFeatureName).toList(), featureDiagram);
+    }
+
     public BDDSolverFacade(List<String> features, FExpression featureDiagram) {
         this.featureMapping = Maps.newHashMap();
         this.constraints = Maps.newHashMap();
@@ -67,7 +72,7 @@ public class BDDSolverFacade implements FeatureModel {
         String numOfNodes = System.getProperty("bddnodes");
         int numberOfNodes;
         if (numOfNodes == null) {
-            numberOfNodes = (int) features.size() * 1000000 + 1;
+            numberOfNodes = features.size() * 1000000 + 1;
         } else {
             numberOfNodes = Integer.parseInt(numOfNodes);
         }
@@ -99,16 +104,9 @@ public class BDDSolverFacade implements FeatureModel {
         }
     }
 
-    /*
-    @Override
-    protected void finalize() throws Throwable {
-        this.factory.done();
-        super.finalize();
-    }*/
-
     @Override
     public ConstraintIdentifier addConstraint(FExpression constraint)
-            throws SolverInitializationException, SolverFatalErrorException {
+            throws SolverInitializationException {
         try {
             ConstraintIdentifier id = new BDDConstraintIdentifier(constraint);
             BDD c = constraint.accept(new FExpressionBDDBuilder(this.factory, this.featureMapping));
@@ -124,7 +122,7 @@ public class BDDSolverFacade implements FeatureModel {
 
     @Override
     public void removeConstraint(ConstraintIdentifier id)
-            throws SolverFatalErrorException, ConstraintNotFoundException {
+            throws ConstraintNotFoundException {
         if (constraints.remove(id) == null) {
             throw new ConstraintNotFoundException("Constraint not found: " + id);
         }
