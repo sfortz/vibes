@@ -2,6 +2,8 @@ package be.vibes.fexpression;
 
 import de.vill.model.Group;
 
+import java.util.Objects;
+
 /*
  * #%L
  * VIBeS: featured expressions
@@ -69,6 +71,11 @@ public class Feature extends de.vill.model.Feature {
             group.setParentFeature(feature);
         }
         return feature;
+    }
+
+    @Override
+    public int hashCode() { //TODO: This is a simplistic version of Hashcode... Maybe this should be improved.
+        return Objects.hash(this.getFeatureName(), this.getNameSpace(), this.getRelatedImport(), this.getLowerBound(), this.getUpperBound(), this.getChildren(), this.getAttributes(), this.getFeatureType(), this.isSubmodelRoot(), this.getParentFeature());
     }
 
 }

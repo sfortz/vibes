@@ -202,12 +202,12 @@ public class FeatureModelFactory extends UVLModelFactory {
             throw new ParseError("Unable to initialise the DimacsModel.");
         }
 
-        SolverFacade solver = null;
+        SolverFacade solver;
 
         switch (this.solverType) {
             case SAT4J -> {
                 try {
-                    new Sat4JSolverFacade(model);
+                    solver = new Sat4JSolverFacade(model);
                 } catch (SolverInitializationException e) {
                     throw new ParseError("Unable to initialise the SAT4J solver.");
                 }
