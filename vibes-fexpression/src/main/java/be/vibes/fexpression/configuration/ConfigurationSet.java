@@ -20,9 +20,7 @@ package be.vibes.fexpression.configuration;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,8 +84,10 @@ public class ConfigurationSet implements Set<Configuration> {
 
     @Override
     public boolean contains(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        if (!(o instanceof Configuration config)) {
+            return false;
+        }
+        return Arrays.asList(toArray()).contains(config);
     }
 
     @Override
@@ -107,56 +107,56 @@ public class ConfigurationSet implements Set<Configuration> {
 
     @Override
     public Object[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
+        List<Configuration> list = new ArrayList<>();
+        iterator().forEachRemaining(list::add);
+        return list.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        // TODO Auto-generated method stub
-        return null;
+        List<Configuration> list = new ArrayList<>();
+        iterator().forEachRemaining(list::add);
+        return list.toArray(a);
     }
 
     @Override
     public boolean add(Configuration e) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Cannot add elements directly to a ConfigurationSet.");
     }
 
     @Override
     public boolean remove(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Cannot remove elements directly to a ConfigurationSet.");
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        return c.stream().allMatch(this::contains);
     }
 
     @Override
     public boolean addAll(Collection<? extends Configuration> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Cannot add elements directly to a ConfigurationSet.");
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Cannot manually modify ConfigurationSet.");
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Cannot manually modify ConfigurationSet.");
     }
 
     @Override
     public void clear() {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException("Cannot manually clear ConfigurationSet.");
     }
 
+    @Override
+    public String toString() {
+        //List<String> list =    iterator().(Configuration::toString).;
+        return "ConfigurationSet{" + Arrays.toString(toArray()) + "}";
+    }
 }

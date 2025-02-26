@@ -174,7 +174,7 @@ public class BDDSolverFacade implements SolverFacade {
     @Override
     public void reset() throws SolverInitializationException {
         this.constraints.clear();
-
+        this.buildModelAndConstraints();
     }
 
     @Override
