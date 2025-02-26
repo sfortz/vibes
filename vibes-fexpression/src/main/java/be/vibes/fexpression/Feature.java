@@ -76,7 +76,7 @@ public class Feature extends de.vill.model.Feature {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getFeatureName(), this.getNameSpace(), this.getRelatedImport(), this.getLowerBound(), this.getUpperBound(), this.getChildren(), this.getAttributes(), this.getFeatureType(), this.isSubmodelRoot(), this.getParentFeature());
+        return Objects.hash(this.getFeatureName(), this.getFeatureType(), this.getUpperBound(), this.getLowerBound(), this.getAttributes(), this.getChildren());
     }
 
 }
