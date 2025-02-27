@@ -19,8 +19,10 @@ package be.vibes.solver;
  * limitations under the License.
  * #L%
  */
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.configuration.Configuration;
@@ -75,9 +77,6 @@ public class FeatureModel extends de.vill.model.FeatureModel {
             return null;
         }
 
-        // Normalize input name to lowercase
-        //String lowerCaseName = name.toLowerCase();
-
         // Find matching feature in a case-insensitive way
         for (Map.Entry<String, de.vill.model.Feature> entry : this.getFeatureMap().entrySet()) {
             if (entry.getKey().equalsIgnoreCase(name)) {
@@ -86,6 +85,14 @@ public class FeatureModel extends de.vill.model.FeatureModel {
         }
 
         return null; // Return null if no match is found
+    }
+
+    public Set<Feature> getFeatures() {
+        Set<Feature> features = new HashSet<>();
+        for (de.vill.model.Feature f : this.getFeatureMap().values()) {
+            features.add(Feature.clone(f));
+        }
+        return features;
     }
 
     /**
