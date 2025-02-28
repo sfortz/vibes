@@ -94,7 +94,9 @@ public class ConfigurationSet implements Set<Configuration> {
     public Iterator<Configuration> iterator() {
         try {
             ConstraintIdentifier id = solver.addSolverConstraint(constraint);
-            return solver.getSolutions();
+            Iterator<Configuration> iterator = solver.getSolutions();
+            solver.removeSolverConstraint(id);
+            return iterator;
         } catch (SolverInitializationException e) {
             logger.error("Error Initializing solver!", e);
         } catch (ConstraintSolvingException e) {

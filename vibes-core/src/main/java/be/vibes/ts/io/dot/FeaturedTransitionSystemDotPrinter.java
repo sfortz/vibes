@@ -40,7 +40,7 @@ public class FeaturedTransitionSystemDotPrinter extends TransitionSystemDotPrint
         FExpression fexpr = ((FeaturedTransitionSystem)ts).getFExpression(tr);
         out.println(getStateId(tr.getSource()) + " -> "
                 + getStateId(tr.getTarget()) + " [ label=\" "
-                + tr.getAction().getName() + "/" + fexpr.toString() + " \" ];");
+                + tr.getAction().getName() + "/" + fexpr.applySimplification().toCnf().toString() + " \" ];");
     }
     
     
