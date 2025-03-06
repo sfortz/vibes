@@ -4,6 +4,7 @@ import be.vibes.fexpression.DimacsModel;
 import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.exception.DimacsFormatException;
 import be.vibes.solver.exception.SolverInitializationException;
+import be.vibes.solver.io.uvl.UVLFexprListener;
 import de.vill.exception.ParseError;
 import de.vill.exception.ParseErrorList;
 import de.vill.main.UVLModelFactory;
@@ -27,27 +28,20 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 
-import static be.vibes.solver.FeatureModelFactory.SolverType.BDD;
-
-public class FeatureModelFactory extends UVLModelFactory {
+public class UVLFeatureModelFactory extends UVLModelFactory {
 
     private final SolverType solverType;
     private final List<ParseError> errorList = new LinkedList<>();
 
-    public enum SolverType {
-        SAT4J,
-        BDD
-    }
-
-    public FeatureModelFactory() {
+    public UVLFeatureModelFactory() {
         this(SolverType.SAT4J);
     }
 
-    public FeatureModelFactory(SolverType type) {
+    public UVLFeatureModelFactory(SolverType type) {
         super();
         switch (type) {
             case SAT4J -> this.solverType = SolverType.SAT4J;
-            case BDD -> this.solverType = BDD;
+            case BDD -> this.solverType = SolverType.BDD;
             default -> throw new UnsupportedOperationException("Only SAT4J and BDD solvers are currently supported. Default is SAT4J.");
         }
     }
@@ -166,7 +160,7 @@ public class FeatureModelFactory extends UVLModelFactory {
                             }
                         }
 
-                        //check if submodel is acutally used
+                        //check if submodel is actually used
                         if (featureModel.getFeatureMap().containsKey(subModel.getRootFeature().getReferenceFromSpecificSubmodel(""))) {
                             importLine.setReferenced(true);
                         }

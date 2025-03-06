@@ -52,6 +52,22 @@ public class FeatureModel extends de.vill.model.FeatureModel {
         this.solver = solver;
     }
 
+    protected FeatureModel(SolverFacade solver) {
+        super();
+        this.solver = solver;
+    }
+
+    protected FeatureModel() {
+        super();
+    }
+
+    protected void setSolver(SolverFacade solver) {
+        if(this.solver == null){
+            this.solver = solver;
+        } else {
+            throw new RuntimeException("This Feature Model solver was already set.");
+        }
+    }
 
     public SolverFacade getSolver() {
         return solver;

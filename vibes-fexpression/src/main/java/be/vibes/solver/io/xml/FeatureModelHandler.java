@@ -1,0 +1,208 @@
+package be.vibes.solver.io.xml;
+
+import be.vibes.fexpression.Feature;
+import be.vibes.solver.FeatureModel;
+import be.vibes.solver.XMLFeatureModelFactory;
+import de.vill.model.Group;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import java.util.Stack;
+
+public class FeatureModelHandler implements XmlEventHandler {
+    public static final String FM_TAG = "fm";
+
+    public static final String FEATURES_TAG = "features";
+    public static final String FEATURE_TAG = "feature";
+    public static final String OPTIONAL_TAG = "optional";
+    public static final String MANDATORY_TAG = "mandatory";
+    public static final String ALTERNATIVE_TAG = "alternative";
+    public static final String OR_TAG = "or";
+
+    public static final String FEATURE_CONSTRAINTS_TAG = "feature_constraints";
+    public static final String EXCLUSIONS_TAG = "exclusions";
+    public static final String EXCLUDE_TAG = "exclude";
+    public static final String REQUIREMENTS_TAG = "requirements";
+    public static final String REQUIRES_TAG = "requires";
+
+    public static final String NAMESPACE_ATTR = "namespace";
+    public static final String NAME_ATTR = "name";
+    public static final String CONFLICT1_ATTR = "conflict1"; //TODO: For more expressiveness, we could add al type of FExpressions
+    public static final String CONFLICT2_ATTR = "conflict2";
+    public static final String FEATURE_ATTR = "feature";
+    public static final String DEPENDENCY_ATTR = "dependency";
+
+    private static final Logger LOG = LoggerFactory.getLogger(FeatureModelHandler.class);
+
+    protected XMLFeatureModelFactory factory;
+    protected String charValue;
+
+    // Stack to track FM depth
+    protected Stack<Group> groupStack = new Stack<>();
+    protected Stack<Feature> featureStack = new Stack<>();
+
+    public FeatureModelHandler() {
+        this.factory = new XMLFeatureModelFactory();
+    }
+
+    public FeatureModel getFeatureModel() {
+        return this.factory.build();
+    }
+
+    public void handleStartDocument() {
+        LOG.trace("Starting document");
+    }
+
+    public void handleEndDocument() {
+        LOG.trace("Ending document");
+    }
+
+    public void handleStartElement(StartElement element) throws XMLStreamException {
+        String tag = element.getName().getLocalPart();
+        switch (tag) {
+            case FM_TAG:
+                handleStartFMTag(element);
+                break;
+            case FEATURES_TAG:
+                handleStartFeaturesTag();
+                break;
+            case FEATURE_TAG:
+                handleStartFeatureTag(element);
+                break;
+            case OPTIONAL_TAG:
+                handleStartOptionalTag(element);
+                break;
+            case MANDATORY_TAG:
+                handleStartMandatoryTag(element);
+                break;
+            case OR_TAG:
+                handleStartOrTag(element);
+                break;
+            case ALTERNATIVE_TAG:
+                handleStartAlternativeTag(element);
+                break;
+            case FEATURE_CONSTRAINTS_TAG:
+                handleStartFConstraintTag();
+                break;
+            case EXCLUSIONS_TAG:
+                handleStartExclusionsTag();
+                break;
+            case EXCLUDE_TAG:
+                handleStartExcludeTag(element);
+                break;
+            case REQUIREMENTS_TAG:
+                handleStartRequirementsTag();
+                break;
+            case REQUIRES_TAG:
+                handleStartRequiresTag(element);
+                break;
+            default:
+                LOG.debug("Unknown element: {}", tag);
+        }
+    }
+
+    protected void handleStartFMTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Starting FM");
+        LOG.trace("Processing namespace");
+        String namespace = element.getAttributeByName(QName.valueOf(NAMESPACE_ATTR)).getValue();
+        factory.setNamespace(namespace);
+    }
+
+    protected void handleStartFeaturesTag() throws XMLStreamException {
+        LOG.trace("Starting Features");
+    }
+
+    protected void handleStartFConstraintTag() throws XMLStreamException {
+        LOG.trace("Starting Feature Constraints");
+    }
+
+    protected void handleStartExclusionsTag() throws XMLStreamException {
+        LOG.trace("Starting Exclusions");
+    }
+
+    protected void handleStartRequirementsTag() throws XMLStreamException {
+        LOG.trace("Starting Requirements");
+    }
+
+    protected void handleStartExcludeTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing Exclusion");
+        String c1 = element.getAttributeByName(QName.valueOf(CONFLICT1_ATTR)).getValue();
+        String c2 = element.getAttributeByName(QName.valueOf(CONFLICT2_ATTR)).getValue();
+        factory.addExclusionConstraint(c1, c2);
+    }
+
+    protected void handleStartRequiresTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing Requirements");
+        String feature = element.getAttributeByName(QName.valueOf(FEATURE_ATTR)).getValue();
+        String dependency = element.getAttributeByName(QName.valueOf(DEPENDENCY_ATTR)).getValue();
+        factory.addRequirementConstraint(feature, dependency);
+    }
+
+    protected void handleStartFeatureTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing feature");
+        String featureName = element.getAttributeByName(QName.valueOf(NAME_ATTR)).getValue();
+
+        Feature currentFeature;
+
+        if (groupStack.isEmpty()){
+            currentFeature = factory.setRootFeature(featureName);
+        } else {
+            currentFeature = factory.addFeature(groupStack.peek(), featureName);
+        }
+        featureStack.push(currentFeature);
+    }
+
+    protected void handleStartOptionalTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing optional group");
+        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OPTIONAL);
+        groupStack.push(currentGroup);
+    }
+    protected void handleStartMandatoryTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing mandatory group");
+        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.MANDATORY);
+        groupStack.push(currentGroup);
+    }
+
+    protected void handleStartOrTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing or group");
+        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OR);
+        groupStack.push(currentGroup);
+    }
+
+    protected void handleStartAlternativeTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing alternative group");
+        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.ALTERNATIVE);
+        groupStack.push(currentGroup);
+    }
+
+    public void handleEndElement(EndElement element) throws XMLStreamException {
+        String tag = element.getName().getLocalPart();
+        switch (tag) {
+            case FEATURE_TAG:
+                LOG.trace("Ending feature");
+                featureStack.pop();
+                break;
+            case MANDATORY_TAG, OPTIONAL_TAG, OR_TAG, ALTERNATIVE_TAG:
+                LOG.trace("Ending group");
+                groupStack.pop();
+                break;
+            case EXCLUDE_TAG:
+                LOG.trace("Ending Exclusion");
+                break;
+            case REQUIRES_TAG:
+                LOG.trace("Ending Requirement");
+                break;
+            case FM_TAG:
+                LOG.trace("Ending feature model");
+                break;
+        }
+    }
+
+    public void handleCharacters(Characters element) throws XMLStreamException {
+        this.charValue = element.asCharacters().getData().trim();
+    }
+}

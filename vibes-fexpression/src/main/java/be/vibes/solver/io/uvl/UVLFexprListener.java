@@ -1,4 +1,4 @@
-package be.vibes.solver;
+package be.vibes.solver.io.uvl;
 
 import uvl.UVLJavaParser;
 import be.vibes.fexpression.FExpression;

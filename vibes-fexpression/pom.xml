@@ -68,6 +68,11 @@
             <artifactId>fm-metamodel</artifactId>
             <version>${uvl_fm.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>txw2</artifactId>
+            <version>${txw2.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
