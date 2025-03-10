@@ -15,8 +15,6 @@ import java.util.Stack;
 
 public class FeatureModelHandler implements XmlEventHandler {
     public static final String FM_TAG = "fm";
-
-    public static final String FEATURES_TAG = "features";
     public static final String FEATURE_TAG = "feature";
     public static final String OPTIONAL_TAG = "optional";
     public static final String MANDATORY_TAG = "mandatory";
@@ -67,9 +65,6 @@ public class FeatureModelHandler implements XmlEventHandler {
             case FM_TAG:
                 handleStartFMTag(element);
                 break;
-            case FEATURES_TAG:
-                handleStartFeaturesTag();
-                break;
             case FEATURE_TAG:
                 handleStartFeatureTag(element);
                 break;
@@ -112,10 +107,6 @@ public class FeatureModelHandler implements XmlEventHandler {
         factory.setNamespace(namespace);
     }
 
-    protected void handleStartFeaturesTag() throws XMLStreamException {
-        LOG.trace("Starting Features");
-    }
-
     protected void handleStartFConstraintTag() throws XMLStreamException {
         LOG.trace("Starting Feature Constraints");
     }
@@ -132,14 +123,14 @@ public class FeatureModelHandler implements XmlEventHandler {
         LOG.trace("Processing Exclusion");
         String c1 = element.getAttributeByName(QName.valueOf(CONFLICT1_ATTR)).getValue();
         String c2 = element.getAttributeByName(QName.valueOf(CONFLICT2_ATTR)).getValue();
-        factory.addExclusionConstraint(c1, c2);
+        factory.addExclusionConstraint(featureStack.peek(), c1, c2);
     }
 
     protected void handleStartRequiresTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing Requirements");
         String feature = element.getAttributeByName(QName.valueOf(FEATURE_ATTR)).getValue();
         String dependency = element.getAttributeByName(QName.valueOf(DEPENDENCY_ATTR)).getValue();
-        factory.addRequirementConstraint(feature, dependency);
+        factory.addRequirementConstraint(featureStack.peek(), feature, dependency);
     }
 
     protected void handleStartFeatureTag(StartElement element) throws XMLStreamException {

@@ -40,6 +40,7 @@ public class XMLFeatureModelFactory {
         Feature feature = new Feature(name);
         feature.setParentGroup(null);
         featureModel.getFeatureMap().put(name, feature);
+        featureModel.getNewFeatureMap().put(name, feature);
         featureModel.setRootFeature(feature);
         return feature;
     }
@@ -56,6 +57,9 @@ public class XMLFeatureModelFactory {
         feature.setParentGroup(group);
         group.getFeatures().add(feature);
         featureModel.getFeatureMap().put(name, feature);
+        featureModel.getNewFeatureMap().put(name, feature);
+
+
         return feature;
     }
 
@@ -68,6 +72,66 @@ public class XMLFeatureModelFactory {
         return features;
     }
 
+    private Set<String> getRecursiveChildren(Feature f) {
+        Set<String> children = new HashSet<>();
+        children.add(f.getFeatureName());
+
+        for(Group g: f.getChildren()){
+            for(de.vill.model.Feature child: g.getFeatures()){
+                children.addAll(getRecursiveChildren(Feature.clone(child)));
+            }
+        }
+        return children;
+    }
+
+    public ExclusionConstraint addExclusionConstraint(Feature lca, String f1, String f2) {
+        return addConstraint(lca, f1, f2, "Exclusion");
+    }
+
+    public RequirementConstraint addRequirementConstraint(Feature lca, String feature, String dependency) {
+        return addConstraint(lca, dependency, feature, "Requirement");
+    }
+
+    private <T extends Constraint> T addConstraint(Feature lca, String f1, String f2, String type) {
+
+        if(featureModel.getFeature(lca.getFeatureName()) == null){
+            throw new FeatureModelDefinitionException( "Impossible to add the new " + type
+                    + " constraint. Feature " + lca.getFeatureName() + " is not part of the FM."
+            );
+        }
+
+        Set<String> children = getRecursiveChildren(lca);
+
+        if(featureModel.getFeature(f1) == null || featureModel.getFeature(f2) == null){
+            throw new FeatureModelDefinitionException("Constraints should only refers to features belonging to the FM.");
+        }
+
+        if (!children.contains(f1) && !children.contains(f2)) {
+            throw new FeatureModelDefinitionException(
+                    type + " constraint should only refer to sub-features of " + lca.getFeatureName() + "."
+            );
+        }
+
+        LiteralConstraint c1 = new LiteralConstraint(f1);
+        LiteralConstraint c2 = new LiteralConstraint(f2);
+
+        switch (type) {
+            case "Exclusion": {
+                ExclusionConstraint constraint = new ExclusionConstraint(c1, c2);
+                lca.getExclusions().add(constraint);
+                featureModel.getOwnConstraints().add(constraint);
+                return (T) constraint;
+            }
+            case "Requirement":
+                RequirementConstraint constraint = new RequirementConstraint(c1, c2);
+                lca.getRequirements().add(constraint);
+                featureModel.getOwnConstraints().add(constraint);
+                return (T) constraint;
+            default: throw new FeatureModelDefinitionException("Unknown type of constraints!");
+        }
+    }
+
+    /*
     public Constraint addExclusionConstraint(Feature f1, Feature f2) {
         return addExclusionConstraint(f1.getFeatureName(), f2.getFeatureName());
     }
@@ -100,7 +164,7 @@ public class XMLFeatureModelFactory {
         Constraint constraint = new RequirementConstraint(d, f);
         featureModel.getOwnConstraints().add(constraint);
         return constraint;
-    }
+    }*/
 
     private FExpression buildFExpression(Feature feature) {
 

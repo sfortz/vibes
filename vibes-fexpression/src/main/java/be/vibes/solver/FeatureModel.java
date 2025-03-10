@@ -1,28 +1,7 @@
 package be.vibes.solver;
 
-/*
- * #%L
- * VIBeS: featured expressions
- * %%
- * Copyright (C) 2014 PReCISE, University of Namur
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.configuration.Configuration;
@@ -35,6 +14,7 @@ import be.vibes.fexpression.Feature;
 public class FeatureModel extends de.vill.model.FeatureModel {
 
     private SolverFacade solver;
+    private final Map<String, Feature> featureMap = new HashMap<>();
 
     protected FeatureModel(de.vill.model.FeatureModel featureModel, SolverFacade solver) {
         super();
@@ -43,6 +23,9 @@ public class FeatureModel extends de.vill.model.FeatureModel {
         this.getImports().addAll(featureModel.getImports());
         this.setRootFeature(featureModel.getRootFeature());
         this.getFeatureMap().putAll(featureModel.getFeatureMap());
+        for(Map.Entry<String, de.vill.model.Feature> entry: featureModel.getFeatureMap().entrySet()){
+            this.featureMap.put(entry.getKey(), Feature.clone(entry.getValue()));
+        }
         this.getImports().addAll(featureModel.getImports());
         this.getOwnConstraints().addAll(featureModel.getOwnConstraints());
         this.setExplicitLanguageLevels(featureModel.isExplicitLanguageLevels());
@@ -85,7 +68,7 @@ public class FeatureModel extends de.vill.model.FeatureModel {
 
     @Override
     public Feature getRootFeature() {
-        return Feature.clone(super.getRootFeature());
+        return getFeature(super.getRootFeature().getFeatureName());
     }
 
     public Feature getFeature(String name) {
@@ -94,21 +77,21 @@ public class FeatureModel extends de.vill.model.FeatureModel {
         }
 
         // Find matching feature in a case-insensitive way
-        for (Map.Entry<String, de.vill.model.Feature> entry : this.getFeatureMap().entrySet()) {
+        for (Map.Entry<String, Feature> entry : this.featureMap.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(name)) {
-                return Feature.clone(entry.getValue());
+                return entry.getValue();
             }
         }
 
         return null; // Return null if no match is found
     }
 
-    public Set<Feature> getFeatures() {
-        Set<Feature> features = new HashSet<>();
-        for (de.vill.model.Feature f : this.getFeatureMap().values()) {
-            features.add(Feature.clone(f));
-        }
-        return features;
+    public Collection<Feature> getFeatures() {
+        return this.featureMap.values();
+    }
+
+    protected  Map<String, Feature> getNewFeatureMap(){
+        return featureMap;
     }
 
     /**
@@ -170,6 +153,54 @@ public class FeatureModel extends de.vill.model.FeatureModel {
      */
     public double getNumberOfSolutions() throws ConstraintSolvingException {
         return this.solver.getNumberOfSolutions();
+    }
+
+    private static List<Feature> getAncestors(Feature feature) {
+        List<Feature> ancestors = new ArrayList<>();
+        while (feature != null) {
+            ancestors.add(feature);
+            feature = feature.getParentFeature();
+        }
+        return ancestors;
+    }
+
+    private static Feature leastCommonAncestor(Feature f1, Feature f2) {
+        List<Feature> ancestorsF1 = getAncestors(f1);
+        List<Feature> ancestorsF2 = getAncestors(f2);
+
+        // Find the lowest common ancestor
+        for (Feature ancestor : ancestorsF1) {
+            if (ancestorsF2.contains(ancestor)) {
+                return ancestor;
+            }
+        }
+
+        return null;
+    }
+
+    public Feature leastCommonAncestor (List<FExpression> fExpressions){
+
+        FExpression disjunction = FExpression.falseValue();
+
+        for (FExpression fexp: fExpressions){
+            disjunction.orWith(fexp);
+        }
+
+        disjunction = disjunction.toCnf().applySimplification();
+
+        if (disjunction.isTrue()) {
+            return this.getRootFeature();
+        }
+
+        Set<Feature> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
+
+        Iterator<Feature> iterator = features.iterator();
+        Feature lca = iterator.next();
+
+        while (iterator.hasNext()) {
+            lca = leastCommonAncestor(lca, iterator.next());
+        }
+        return lca;
     }
 
 }

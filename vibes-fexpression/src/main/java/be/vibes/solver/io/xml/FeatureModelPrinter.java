@@ -3,14 +3,12 @@ package be.vibes.solver.io.xml;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
-import de.vill.model.Feature;
+import be.vibes.fexpression.Feature;
 import de.vill.model.Group;
-import de.vill.model.constraint.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static be.vibes.solver.io.xml.FeatureModelHandler.*;
@@ -19,22 +17,18 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureModelPrinter.class);
 
+    private FeatureModel fm;
+
     @Override
     public void printElement(XMLStreamWriter xtw, FeatureModel fm) throws XMLStreamException {
 
+        this.fm = fm;
         LOG.trace("Printing FM element");
         xtw.writeStartElement(FM_TAG);
         xtw.writeAttribute(NAMESPACE_ATTR, fm.getNamespace());
-
-        xtw.writeStartElement(FEATURES_TAG);
         printElement(xtw, fm.getRootFeature());
         xtw.writeEndElement();
-
-        xtw.writeStartElement(FEATURE_CONSTRAINTS_TAG);
-        printElement(xtw, fm.getOwnConstraints());
-        xtw.writeEndElement();
-
-        xtw.writeEndElement();
+        this.fm = null;
     }
 
     @Override
@@ -45,6 +39,17 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
         for(Group group: feature.getChildren()){
             printElement(xtw, group);
         }
+
+        if(feature.getTotalNumberOfConstraints() > 0){
+            xtw.writeStartElement(FEATURE_CONSTRAINTS_TAG);
+            if(feature.getNumberOfExclusionConstraints() > 0){
+                printExclusions(xtw, feature.getExclusions());
+            }
+            if(feature.getNumberOfRequirementConstraints() > 0){
+                printRequirements(xtw, feature.getRequirements());
+            }
+            xtw.writeEndElement();
+        }
         xtw.writeEndElement();
     }
 
@@ -52,49 +57,29 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
     public void printElement(XMLStreamWriter xtw, Group group) throws XMLStreamException {
         LOG.trace("Printing group element");
         switch (group.GROUPTYPE){
-            case OR -> {
-                xtw.writeStartElement(OR_TAG);
-            }
-            case ALTERNATIVE -> {
-                xtw.writeStartElement(ALTERNATIVE_TAG);
-            }
-            case MANDATORY -> {
-                xtw.writeStartElement(MANDATORY_TAG);
-            }
-            case OPTIONAL -> {
-                xtw.writeStartElement(OPTIONAL_TAG);
-            }
+            case OR -> xtw.writeStartElement(OR_TAG);
+            case ALTERNATIVE -> xtw.writeStartElement(ALTERNATIVE_TAG);
+            case MANDATORY -> xtw.writeStartElement(MANDATORY_TAG);
+            case OPTIONAL -> xtw.writeStartElement(OPTIONAL_TAG);
         }
-        for(Feature feature: group.getFeatures()){
-            printElement(xtw, feature);
+        for(de.vill.model.Feature feature: group.getFeatures()){
+            Feature f = fm.getFeature(feature.getFeatureName());
+            printElement(xtw, f);
         }
         xtw.writeEndElement();
     }
 
     @Override
-    public void printElement(XMLStreamWriter xtw, List<Constraint> constraints) throws XMLStreamException {
-
-        List<ExclusionConstraint> exclusions = new ArrayList<>();
-        List<RequirementConstraint> requirements = new ArrayList<>();
-
-        for(Constraint constraint: constraints){
-            switch (constraint) {
-                case RequirementConstraint c -> {
-                    requirements.add(c);
-                }
-                case ExclusionConstraint c -> {
-                    exclusions.add(c);
-                }
-                default -> throw new XMLStreamException("Type of constraint " + constraint + " is undefined!");
-            }
-        }
-
+    public void printExclusions(XMLStreamWriter xtw, List<ExclusionConstraint> exclusions) throws XMLStreamException {
         xtw.writeStartElement(EXCLUSIONS_TAG);
         for (ExclusionConstraint constraint : exclusions) {
             printElement(xtw, constraint);
         }
         xtw.writeEndElement();
+    }
 
+    @Override
+    public void printRequirements(XMLStreamWriter xtw, List<RequirementConstraint> requirements) throws XMLStreamException {
         xtw.writeStartElement(REQUIREMENTS_TAG);
         for (RequirementConstraint constraint : requirements) {
             printElement(xtw, constraint);
