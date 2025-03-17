@@ -22,7 +22,7 @@ import static de.vill.util.Util.addNecessaryQuotes;
  * This class represents a feature model and all its sub featuremodels if the
  * model is composed.
  */
-public class FeatureModel {
+public class FeatureModel<T extends Feature> {
     private final Set<LanguageLevel> usedLanguageLevels = new HashSet<LanguageLevel>() {
         {
             add(LanguageLevel.BOOLEAN_LEVEL);
@@ -30,8 +30,8 @@ public class FeatureModel {
     };
     private String namespace;
     private final List<Import> imports = new LinkedList<>();
-    private Feature rootFeature;
-    private final Map<String, Feature> featureMap = new HashMap<>();
+    private T rootFeature;
+    private final Map<String, T> featureMap = new HashMap<>();
     private final List<Constraint> ownConstraints = new LinkedList<>();
     private boolean explicitLanguageLevels = false;
     private SolverFacade solver;
@@ -76,13 +76,13 @@ public class FeatureModel {
         return solver;
     }
 
-    public Feature getFeature(String name) {
+    public T getFeature(String name) {
         if (name == null) {
             return null;
         }
 
         // Find matching feature in a case-insensitive way
-        for (Map.Entry<String, Feature> entry : this.featureMap.entrySet()) {
+        for (Map.Entry<String, T> entry : this.featureMap.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(name)) {
                 return entry.getValue();
             }
@@ -91,7 +91,7 @@ public class FeatureModel {
         return null; // Return null if no match is found
     }
 
-    public Collection<Feature> getFeatures() {
+    public Collection<T> getFeatures() {
         return this.featureMap.values();
     }
 
@@ -104,8 +104,7 @@ public class FeatureModel {
      * @return the used language levels as set
      */
     public Set<LanguageLevel> getUsedLanguageLevelsRecursively() {
-        Set<LanguageLevel> languageLevels = new HashSet<>();
-        languageLevels.addAll(getUsedLanguageLevels());
+        Set<LanguageLevel> languageLevels = new HashSet<>(getUsedLanguageLevels());
         for (Import importLine : imports) {
             if (importLine.isReferenced()) {
                 languageLevels.addAll(importLine.getFeatureModel().getUsedLanguageLevelsRecursively());
@@ -167,7 +166,7 @@ public class FeatureModel {
      *
      * @return root feature
      */
-    public Feature getRootFeature() {
+    public T getRootFeature() {
         return rootFeature;
     }
 
@@ -176,7 +175,7 @@ public class FeatureModel {
      *
      * @param rootFeature the root feature
      */
-    public void setRootFeature(Feature rootFeature) {
+    public void setRootFeature(T rootFeature) {
         this.rootFeature = rootFeature;
         // TODO: Change the solver by getting the root feature Feature Diagram.
     }
@@ -195,7 +194,7 @@ public class FeatureModel {
      *
      * @return A map with all features of the feature model
      */
-    public Map<String, Feature> getFeatureMap() {
+    public Map<String, T> getFeatureMap() {
         return featureMap;
     }
 
@@ -221,7 +220,7 @@ public class FeatureModel {
         return getFeatureConstraints(getRootFeature());
     }
 
-    private List<Constraint> getFeatureConstraints(Feature feature) {
+    private List<Constraint> getFeatureConstraints(T feature) {
         List<Constraint> featureConstraints = new LinkedList<>();
         Attribute<Constraint> featureConstraint = feature.getAttributes().get("constraint");
         Attribute<List<Constraint>> featureConstraintList = feature.getAttributes().get("constraints");
@@ -234,7 +233,7 @@ public class FeatureModel {
         for (Group childGroup : feature.getChildren()) {
             for (Feature childFeature : childGroup.getFeatures()) {
                 if (!childFeature.isSubmodelRoot()) {
-                    featureConstraints.addAll(getFeatureConstraints(childFeature));
+                    featureConstraints.addAll(getFeatureConstraints((T) childFeature));
                 }
             }
         }
@@ -303,7 +302,7 @@ public class FeatureModel {
             result.append(Configuration.getNewlineSymbol());
             result.append(Configuration.getNewlineSymbol());
         }
-        if (explicitLanguageLevels && usedLanguageLevels.size() != 0) {
+        if (explicitLanguageLevels && !usedLanguageLevels.isEmpty()) {
             result.append("include");
             result.append(Configuration.getNewlineSymbol());
             Set<LanguageLevel> levelsToPrint;
@@ -316,7 +315,7 @@ public class FeatureModel {
                 result.append(Configuration.getTabulatorSymbol());
                 if (LanguageLevel.isMajorLevel(languageLevel)) {
                 } else {
-                    result.append(LanguageLevel.valueOf(languageLevel.getValue() - 1).get(0).getName());
+                    result.append(LanguageLevel.valueOf(languageLevel.getValue() - 1).getFirst().getName());
                     result.append(".");
                 }
                 result.append(languageLevel.getName());
@@ -324,7 +323,7 @@ public class FeatureModel {
             }
             result.append(Configuration.getNewlineSymbol());
         }
-        if (imports.size() > 0 && !withSubmodels) {
+        if (!imports.isEmpty() && !withSubmodels) {
             result.append("imports");
             result.append(Configuration.getNewlineSymbol());
             for (Import importLine : imports) {
@@ -351,8 +350,7 @@ public class FeatureModel {
 
         List<Constraint> constraintList;
         if (withSubmodels) {
-            constraintList = new LinkedList<>();
-            constraintList.addAll(ownConstraints);
+            constraintList = new LinkedList<>(ownConstraints);
             for (Import importLine : imports) {
                 // only print the constraints of a submodel if the import is actually used
                 if (importLine.isReferenced()) {
@@ -362,7 +360,7 @@ public class FeatureModel {
         } else {
             constraintList = getOwnConstraints();
         }
-        if (constraintList.size() > 0) {
+        if (!constraintList.isEmpty()) {
             result.append("constraints");
             result.append(Configuration.getNewlineSymbol());
             for (Constraint constraint : constraintList) {
@@ -420,45 +418,45 @@ public class FeatureModel {
             return false;
         }
 
-        if (!this.namespace.equals(((FeatureModel) obj).namespace)) {
+        if (!this.namespace.equals(((FeatureModel<?>) obj).namespace)) {
             return false;
         }
 
-        if (!this.getRootFeature().equals(((FeatureModel) obj).getRootFeature())) {
+        if (!this.getRootFeature().equals(((FeatureModel<?>) obj).getRootFeature())) {
             return false;
         }
 
 
-        if (this.getImports().size() != ((FeatureModel) obj).getImports().size()) {
+        if (this.getImports().size() != ((FeatureModel<?>) obj).getImports().size()) {
             return false;
         }
 
-        if (this.getUsedLanguageLevels().size() != ((FeatureModel) obj).getUsedLanguageLevels().size()) {
+        if (this.getUsedLanguageLevels().size() != ((FeatureModel<?>) obj).getUsedLanguageLevels().size()) {
             return false;
         }
 
         for (LanguageLevel languageLevel: this.getUsedLanguageLevels()) {
-            if (!(((FeatureModel) obj).getUsedLanguageLevels().contains(languageLevel))) {
+            if (!(((FeatureModel<?>) obj).getUsedLanguageLevels().contains(languageLevel))) {
                 return false;
             }
         }
 
-        List<Import> objImports = ((FeatureModel) obj).getImports();
+        List<Import> objImports = ((FeatureModel<?>) obj).getImports();
         for (Import thisImport: this.getImports()) {
             final Optional<Import> identicalImport = objImports.stream()
                     .filter(imp -> imp.getFeatureModel().equals(thisImport.getFeatureModel()))
                     .findFirst();
 
-            if (!identicalImport.isPresent()) {
+            if (identicalImport.isEmpty()) {
                 return false;
             }
         }
 
-        if (this.getOwnConstraints().size() != ((FeatureModel) obj).getOwnConstraints().size()) {
+        if (this.getOwnConstraints().size() != ((FeatureModel<?>) obj).getOwnConstraints().size()) {
             return false;
         }
 
-        List<Constraint> objConstraints = ((FeatureModel) obj).getOwnConstraints();
+        List<Constraint> objConstraints = ((FeatureModel<?>) obj).getOwnConstraints();
         for (final Constraint constraint : this.getOwnConstraints()) {
             if (!objConstraints.contains(constraint)) {
                 return false;
@@ -488,7 +486,6 @@ public class FeatureModel {
      * @throws SolverFatalErrorException                             If the solver encounter an error it
      *                                                               could not recover from. Solver should be reset when this exception is
      *                                                               launched.
-     * @throws be.vibes.solver.exception.ConstraintNotFoundException
      */
     public void removeSolverConstraint(ConstraintIdentifier id)
             throws SolverFatalErrorException, ConstraintNotFoundException {
@@ -523,28 +520,26 @@ public class FeatureModel {
     /**
      * Returns the number of solutions.
      *
-     * @return
-     * @throws be.vibes.solver.exception.ConstraintSolvingException
      */
     public double getNumberOfSolutions() throws ConstraintSolvingException {
         return this.solver.getNumberOfSolutions();
     }
 
-    private static List<Feature> getAncestors(Feature feature) {
-        List<Feature> ancestors = new ArrayList<>();
+    private List<T> getAncestors(T feature) {
+        List<T> ancestors = new ArrayList<>();
         while (feature != null) {
             ancestors.add(feature);
-            feature = feature.getParentFeature();
+            feature = (T) feature.getParentFeature();
         }
         return ancestors;
     }
 
-    private static Feature leastCommonAncestor(Feature f1, Feature f2) {
-        List<Feature> ancestorsF1 = getAncestors(f1);
-        List<Feature> ancestorsF2 = getAncestors(f2);
+    private T leastCommonAncestor(T f1, T f2) {
+        List<T> ancestorsF1 = getAncestors(f1);
+        List<T> ancestorsF2 = getAncestors(f2);
 
         // Find the lowest common ancestor
-        for (Feature ancestor : ancestorsF1) {
+        for (T ancestor : ancestorsF1) {
             if (ancestorsF2.contains(ancestor)) {
                 return ancestor;
             }
@@ -553,7 +548,7 @@ public class FeatureModel {
         return null;
     }
 
-    public Feature leastCommonAncestor (List<FExpression> fExpressions){
+    public T leastCommonAncestor (List<FExpression> fExpressions){
 
         FExpression disjunction = FExpression.falseValue();
 
@@ -567,10 +562,10 @@ public class FeatureModel {
             return this.getRootFeature();
         }
 
-        Set<Feature> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
+        Set<T> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
 
-        Iterator<Feature> iterator = features.iterator();
-        Feature lca = iterator.next();
+        Iterator<T> iterator = features.iterator();
+        T lca = iterator.next();
 
         while (iterator.hasNext()) {
             lca = leastCommonAncestor(lca, iterator.next());

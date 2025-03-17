@@ -19,7 +19,7 @@ import uvl.UVLJavaParser;
 import java.util.*;
 
 public class UVLListener extends UVLJavaBaseListener {
-    private final FeatureModel featureModel;
+    private final FeatureModel<Feature> featureModel;
     private final Set<LanguageLevel> importedLanguageLevels = new HashSet<>(List.of(LanguageLevel.BOOLEAN_LEVEL));
     private final Stack<Feature> featureStack = new Stack<>();
     private final Stack<Group> groupStack = new Stack<>();
@@ -35,13 +35,13 @@ public class UVLListener extends UVLJavaBaseListener {
 
     public UVLListener(){
         super();
-        this.featureModel = new FeatureModel();
+        this.featureModel = new FeatureModel<>();
         this.solverType = SolverType.SAT4J;
     }
 
     public UVLListener(SolverType type){
         super();
-        this.featureModel = new FeatureModel();
+        this.featureModel = new FeatureModel<>();
         this.solverType = type;
     }
 
@@ -306,7 +306,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterParenthesisConstraint(UVLJavaParser.ParenthesisConstraintContext ctx) {
-        errorList.add(new ParseError("This type of constraint is not yet supported! "));
+        errorList.add(new ParseError("ParenthesisConstraint are not yet supported."));
     }
 
     @Override
@@ -334,12 +334,12 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterImplicationConstraint(UVLJavaParser.ImplicationConstraintContext ctx) {
-        errorList.add(new ParseError("This type of constraint is not yet supported! "));
+        errorList.add(new ParseError("ImplicationConstraint are not yet supported."));
     }
 
     @Override
     public void enterEquivalenceConstraint(UVLJavaParser.EquivalenceConstraintContext ctx) {
-        errorList.add(new ParseError("This type of constraint is not yet supported! "));
+        errorList.add(new ParseError("EquivalenceConstraint are not yet supported."));
     }
 
     @Override
@@ -472,98 +472,26 @@ public class UVLListener extends UVLJavaBaseListener {
     }
 
     @Override
-    public void exitSumAggregateFunction(UVLJavaParser.SumAggregateFunctionContext ctx) {
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.ARITHMETIC_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.AGGREGATE_FUNCTION);
-        AggregateFunctionExpression expression;
-        if (ctx.reference().size() > 1) {
-            expression = new SumAggregateFunctionExpression(ctx.reference().get(1).getText().replace("\"", ""), ctx.reference().get(0).getText().replace("\"", ""));
-            featureModel.getAggregateFunctionsWithRootFeature().add(expression);
-        } else {
-            expression = new SumAggregateFunctionExpression(ctx.reference().getFirst().getText().replace("\"", ""));
-        }
-        expressionStack.push(expression);
-        Token t = ctx.getStart();
-        int line = t.getLine();
-        expression.setLineNumber(line);
+    public void enterSumAggregateFunction(UVLJavaParser.SumAggregateFunctionContext ctx) {
+        errorList.add(new ParseError("AggregateFunction are not yet supported! "));
     }
 
     @Override
-    public void exitAvgAggregateFunction(UVLJavaParser.AvgAggregateFunctionContext ctx) {
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.ARITHMETIC_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.AGGREGATE_FUNCTION);
-        AggregateFunctionExpression expression;
-        if (ctx.reference().size() > 1) {
-            expression = new AvgAggregateFunctionExpression(ctx.reference().get(1).getText().replace("\"", ""), ctx.reference().get(0).getText().replace("\"", ""));
-            featureModel.getAggregateFunctionsWithRootFeature().add(expression);
-        } else {
-            expression = new AvgAggregateFunctionExpression(ctx.reference().getFirst().getText().replace("\"", ""));
-        }
-        expressionStack.push(expression);
-        Token t = ctx.getStart();
-        int line = t.getLine();
-        expression.setLineNumber(line);
+    public void enterAvgAggregateFunction(UVLJavaParser.AvgAggregateFunctionContext ctx) {
+        errorList.add(new ParseError("AggregateFunction are not yet supported! "));
     }
 
     @Override
-    public void exitLengthAggregateFunction(UVLJavaParser.LengthAggregateFunctionContext ctx) {
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.TYPE_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.STRING_CONSTRAINTS);
-
-        String reference = ctx.reference().getText().replace("\"", "");
-        if (!(featureModel.getFeatureMap().containsKey(reference) && FeatureType.STRING.equals(featureModel.getFeatureMap().get(reference).getFeatureType()))) {
-            errorList.add(new ParseError("Length Aggregate Function can only be used with String features"));
-            return;
-        }
-
-        AggregateFunctionExpression expression = new LengthAggregateFunctionExpression(reference);
-        featureModel.getAggregateFunctionsWithRootFeature().add(expression);
-        expressionStack.push(expression);
-        Token t = ctx.getStart();
-        int line = t.getLine();
-        expression.setLineNumber(line);
+    public void enterLengthAggregateFunction(UVLJavaParser.LengthAggregateFunctionContext ctx) {
+        errorList.add(new ParseError("AggregateFunction are not yet supported! "));
     }
 
-    @Override public void exitFloorAggregateFunction(UVLJavaParser.FloorAggregateFunctionContext ctx) {
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.TYPE_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.NUMERIC_CONSTRAINTS);
-
-        String reference = ctx.reference().getText().replace("\"", "");
-        if (!(featureModel.getFeatureMap().containsKey(reference) && (
-            FeatureType.INT.equals(featureModel.getFeatureMap().get(reference).getFeatureType())
-                || FeatureType.REAL.equals(featureModel.getFeatureMap().get(reference).getFeatureType())
-        ))) {
-            errorList.add(new ParseError("Floor Aggregate Function can only be used with Integer or Real features"));
-            return;
-        }
-
-        AggregateFunctionExpression expression = new FloorAggregateFunctionExpression(reference);
-        featureModel.getAggregateFunctionsWithRootFeature().add(expression);
-        expressionStack.push(expression);
-        Token t = ctx.getStart();
-        int line = t.getLine();
-        expression.setLineNumber(line);
+    @Override public void enterFloorAggregateFunction(UVLJavaParser.FloorAggregateFunctionContext ctx) {
+        errorList.add(new ParseError("AggregateFunction are not yet supported! "));
     }
 
-    @Override public void exitCeilAggregateFunction(UVLJavaParser.CeilAggregateFunctionContext ctx) {
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.TYPE_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.NUMERIC_CONSTRAINTS);
-
-        String reference = ctx.reference().getText().replace("\"", "");
-        if (!(featureModel.getFeatureMap().containsKey(reference) && (
-            FeatureType.INT.equals(featureModel.getFeatureMap().get(reference).getFeatureType())
-                || FeatureType.REAL.equals(featureModel.getFeatureMap().get(reference).getFeatureType())
-        ))) {
-            errorList.add(new ParseError("Ceil Aggregate Function can only be used with Integer or Real features"));
-            return;
-        }
-
-        AggregateFunctionExpression expression = new CeilAggregateFunctionExpression(reference);
-        featureModel.getAggregateFunctionsWithRootFeature().add(expression);
-        expressionStack.push(expression);
-        Token t = ctx.getStart();
-        int line = t.getLine();
-        expression.setLineNumber(line);
+    @Override public void enterCeilAggregateFunction(UVLJavaParser.CeilAggregateFunctionContext ctx) {
+        errorList.add(new ParseError("AggregateFunction are not yet supported! "));
     }
 
     public FExpression getConstraint() {
@@ -583,7 +511,7 @@ public class UVLListener extends UVLJavaBaseListener {
         }
     }
 
-    public FeatureModel getFeatureModel() {
+    public FeatureModel<Feature> getFeatureModel() {
         if (!errorList.isEmpty()) {
             ParseErrorList parseErrorList = new ParseErrorList("Multiple Errors occurred during parsing!");
             parseErrorList.getErrorList().addAll(errorList);

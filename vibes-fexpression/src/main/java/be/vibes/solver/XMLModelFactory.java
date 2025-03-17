@@ -9,14 +9,15 @@ import be.vibes.solver.constraints.RequirementConstraint;
 import be.vibes.solver.exception.FeatureModelDefinitionException;
 import be.vibes.solver.exception.SolverInitializationException;
 import de.vill.exception.ParseError;
-import de.vill.model.constraint.*;
+import de.vill.model.constraint.Constraint;
+import de.vill.model.constraint.LiteralConstraint;
 
 import java.util.*;
 
 public class XMLModelFactory {
 
     private final SolverType solverType;
-    private final FeatureModel featureModel;
+    private final FeatureModel<Feature> featureModel;
 
     public XMLModelFactory() {
         this(SolverType.SAT4J);
@@ -285,7 +286,7 @@ public class XMLModelFactory {
         return solver;
     }
 
-    public FeatureModel build() {
+    public FeatureModel<?> build() {
         FExpression fexp = buildFExpression(featureModel.getRootFeature());
 
         for(Constraint constr: featureModel.getOwnConstraints()){
