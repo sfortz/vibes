@@ -16,11 +16,8 @@ import static de.vill.util.Util.addNecessaryQuotes;
  * This class represents a feature of any kind (normal, numeric, abstract, ...).
  */
 public class Feature {
-    public void setFeatureName(String featureName) {
-        this.featureName = featureName;
-    }
 
-    private String featureName;
+    private final String featureName;
     private String nameSpace = "";
     private Import relatedImport;
     private String lowerBound;

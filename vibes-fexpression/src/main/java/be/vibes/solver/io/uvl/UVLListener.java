@@ -47,7 +47,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterIncludes(UVLJavaParser.IncludesContext ctx) {
-        featureModel.setExplicitLanguageLevels(true);
+        errorList.add(new ParseError("Includes are not yet supported! "));
     }
 
     @Override
@@ -173,30 +173,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterCardinalityGroup(UVLJavaParser.CardinalityGroupContext ctx) {
-        Group group = new Group(Group.GroupType.GROUP_CARDINALITY);
-        String lowerBound;
-        String upperBound;
-        if (ctx.getText().contains("..")) {
-            lowerBound = ctx.CARDINALITY().getText().replace("[", "").replace("]", "").split("\\.\\.")[0];
-            upperBound = ctx.CARDINALITY().getText().replace("[", "").replace("]", "").split("\\.\\.")[1];
-        } else {
-            lowerBound = ctx.getText().replace("[", "").replace("]", "");
-            upperBound = lowerBound;
-        }
-        group.setLowerBound(lowerBound);
-        group.setUpperBound(upperBound);
-
-        Feature feature = featureStack.peek();
-        feature.addChildren(group);
-        group.setParentFeature(feature);
-        groupStack.push(group);
-
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.GROUP_CARDINALITY);
-    }
-
-    @Override
-    public void exitCardinalityGroup(UVLJavaParser.CardinalityGroupContext ctx) {
-        groupStack.pop();
+        errorList.add(new ParseError("Cardinalities are not yet supported! "));
     }
 
     @Override
@@ -244,9 +221,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterFeatureType(final UVLJavaParser.FeatureTypeContext ctx) {
-        final Feature feature = this.featureStack.peek();
-        feature.setFeatureType(FeatureType.fromString(ctx.getText().toLowerCase()));
-        this.featureModel.getUsedLanguageLevels().add(LanguageLevel.TYPE_LEVEL);
+        errorList.add(new ParseError("Feature types are not yet supported! "));
     }
 
     @Override
@@ -268,9 +243,6 @@ public class UVLListener extends UVLJavaBaseListener {
         Feature feature = featureStack.peek();
         feature.setLowerBound(lowerBound);
         feature.setUpperBound(upperBound);
-
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.ARITHMETIC_LEVEL);
-        featureModel.getUsedLanguageLevels().add(LanguageLevel.FEATURE_CARDINALITY);
     }
 
     @Override
@@ -295,7 +267,6 @@ public class UVLListener extends UVLJavaBaseListener {
 
         LiteralConstraint constraint = new LiteralConstraint(featureReference);
 
-        featureModel.getLiteralConstraints().add(constraint);
         Token t = ctx.getStart();
         int line = t.getLine();
         constraint.setLineNumber(line);
@@ -390,14 +361,6 @@ public class UVLListener extends UVLJavaBaseListener {
     public void exitStringLiteralExpression(UVLJavaParser.StringLiteralExpressionContext ctx) {
         Expression expression = new StringExpression(ctx.STRING().getText().replace("'", ""));
         expressionStack.push(expression);
-        if (expressionStack.peek() instanceof LiteralExpression literalExpression) {
-            if (literalExpression.getAttributeName() == null) {
-                featureModel.getUsedLanguageLevels().add(LanguageLevel.TYPE_LEVEL);
-                featureModel.getUsedLanguageLevels().add(LanguageLevel.STRING_CONSTRAINTS);
-            } else {
-                featureModel.getUsedLanguageLevels().add(LanguageLevel.ARITHMETIC_LEVEL);
-            }
-        }
         Token t = ctx.getStart();
         int line = t.getLine();
         expression.setLineNumber(line);
@@ -416,12 +379,7 @@ public class UVLListener extends UVLJavaBaseListener {
     public void exitLiteralExpression(UVLJavaParser.LiteralExpressionContext ctx) {
         String reference = ctx.reference().getText().replace("\"", "");
         LiteralExpression expression = new LiteralExpression(reference);
-        String[] splitReference = reference.split("\\.");
-        if (splitReference.length > 1) {
-            featureModel.getUsedLanguageLevels().add(LanguageLevel.ARITHMETIC_LEVEL);
-        }
         expressionStack.push(expression);
-        featureModel.getLiteralExpressions().add(expression);
         Token t = ctx.getStart();
         int line = t.getLine();
         expression.setLineNumber(line);
@@ -501,14 +459,6 @@ public class UVLListener extends UVLJavaBaseListener {
             throw parseErrorList;
         }
         return constraintStack.pop();
-    }
-
-    @Override
-    public void exitFeatureModel(UVLJavaParser.FeatureModelContext ctx) {
-        if (featureModel.isExplicitLanguageLevels() && !featureModel.getUsedLanguageLevels().equals(importedLanguageLevels)) {
-            errorList.add(new ParseError("Imported and actually used language levels do not match! \n Imported: " + importedLanguageLevels.toString() + "\nAcutally Used: " + featureModel.getUsedLanguageLevels().toString()));
-            //throw new ParseError("Imported and actually used language levels do not match! \n Imported: " + importedLanguageLevels.toString() + "\nAcutally Used: " + featureModel.getUsedLanguageLevels().toString());
-        }
     }
 
     public FeatureModel<Feature> getFeatureModel() {
