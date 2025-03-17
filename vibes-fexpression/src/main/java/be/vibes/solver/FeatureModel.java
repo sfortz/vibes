@@ -5,12 +5,7 @@ import be.vibes.fexpression.Feature;
 import be.vibes.solver.exception.*;
 import de.vill.config.Configuration;
 import de.vill.model.Attribute;
-import de.vill.model.Import;
-import de.vill.model.LanguageLevel;
 import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.LiteralConstraint;
-import de.vill.model.expression.AggregateFunctionExpression;
-import de.vill.model.expression.LiteralExpression;
 import de.vill.util.Util;
 
 import java.util.*;
@@ -23,31 +18,12 @@ import static de.vill.util.Util.addNecessaryQuotes;
  * model is composed.
  */
 public class FeatureModel<T extends Feature> {
-    private final Set<LanguageLevel> usedLanguageLevels = new HashSet<LanguageLevel>() {
-        {
-            add(LanguageLevel.BOOLEAN_LEVEL);
-        }
-    };
+
     private String namespace;
-    private final List<Import> imports = new LinkedList<>();
     private T rootFeature;
     private final Map<String, T> featureMap = new HashMap<>();
     private final List<Constraint> ownConstraints = new LinkedList<>();
-    private boolean explicitLanguageLevels = false;
     private SolverFacade solver;
-
-
-    /*
-     * These three lists are just for performance. They contain all points where
-     * features are referenced e.g. in constraints or aggregate functions. The
-     * corresponding feature can not be set during parsing, because the feature may
-     * be in a sub-model which is not parsed then. Therefore. we store all this
-     * objects to reference the features after everything is parsed without
-     * searching for them.
-     */
-    private final List<LiteralConstraint> literalConstraints = new LinkedList<>();
-    private final List<LiteralExpression> literalExpressions = new LinkedList<>();
-    private final List<AggregateFunctionExpression> aggregateFunctionsWithRootFeature = new LinkedList<>();
 
     /**
      * Be very careful when creating your own featuremodel to set all information in
@@ -62,6 +38,15 @@ public class FeatureModel<T extends Feature> {
     public FeatureModel(SolverFacade solver) {
         super();
         this.solver = solver;
+    }
+
+    public FeatureModel(FeatureModel<T> fm) {
+        super();
+        this.featureMap.putAll(fm.featureMap);
+        this.ownConstraints.addAll(fm.ownConstraints);
+        this.namespace = fm.namespace;
+        this.solver = fm.solver;
+        this.rootFeature = fm.rootFeature;
     }
 
     public void setSolver(SolverFacade solver) {
@@ -96,36 +81,6 @@ public class FeatureModel<T extends Feature> {
     }
 
     /**
-     * Get a set with all in this featuremodel used language levels (major and
-     * minor). This list contains the levels used in this feature model and all its
-     * sub feature models (that are actually used) The returned set is a copy,
-     * therefore changing it will NOT change the featuremodel.
-     *
-     * @return the used language levels as set
-     */
-    public Set<LanguageLevel> getUsedLanguageLevelsRecursively() {
-        Set<LanguageLevel> languageLevels = new HashSet<>(getUsedLanguageLevels());
-        for (Import importLine : imports) {
-            if (importLine.isReferenced()) {
-                languageLevels.addAll(importLine.getFeatureModel().getUsedLanguageLevelsRecursively());
-            }
-        }
-        return languageLevels;
-    }
-
-    /**
-     * Get a set with all in this featuremodel used language levels (major and
-     * minor). This list contains the levels used in this feature model but not the
-     * ones used in submodels. The returned set is no copy, therefore changing it
-     * will change the featuremodel.
-     *
-     * @return the used language levels as set
-     */
-    public Set<LanguageLevel> getUsedLanguageLevels() {
-        return usedLanguageLevels;
-    }
-
-    /**
      * Returns the namespace of the featuremodel. If no namespace is set, the
      * featuremodel returns the name of the root feature.
      *
@@ -147,18 +102,6 @@ public class FeatureModel<T extends Feature> {
      */
     public void setNamespace(String namespace) {
         this.namespace = namespace;
-    }
-
-    /**
-     * This method returns a list of the imports of the feature model. The list does
-     * not contain recursivly all imports (including imports of imported feature
-     * models), just the directly imported ones in this feature model. This list is
-     * no clone. Changing it will actually change the feature model.
-     *
-     * @return A list containing all imports of this feature model.
-     */
-    public List<Import> getImports() {
-        return imports;
     }
 
     /**
@@ -256,32 +199,7 @@ public class FeatureModel<T extends Feature> {
         List<Constraint> constraints = new LinkedList<Constraint>();
         constraints.addAll(ownConstraints);
         constraints.addAll(getFeatureConstraints());
-        for (Import importLine : imports) {
-            if (importLine.isReferenced()) {
-                constraints.addAll(importLine.getFeatureModel().getConstraints());
-            }
-        }
         return constraints;
-    }
-
-    /**
-     * Boolean whether the used language levels are explicitly imported or not
-     *
-     * @return true if all levels must be explicitly imported, fales if not
-     */
-    public boolean isExplicitLanguageLevels() {
-        return explicitLanguageLevels;
-    }
-
-    /**
-     * Boolean whether the used language levels are explicitly imported or not. This
-     * determines if the used levels are printed in the toSring method
-     *
-     * @param explicitLanguageLevels true if all levels must be explicitly imported,
-     *                               fales if not
-     */
-    public void setExplicitLanguageLevels(boolean explicitLanguageLevels) {
-        this.explicitLanguageLevels = explicitLanguageLevels;
     }
 
     /**
@@ -302,41 +220,7 @@ public class FeatureModel<T extends Feature> {
             result.append(Configuration.getNewlineSymbol());
             result.append(Configuration.getNewlineSymbol());
         }
-        if (explicitLanguageLevels && !usedLanguageLevels.isEmpty()) {
-            result.append("include");
-            result.append(Configuration.getNewlineSymbol());
-            Set<LanguageLevel> levelsToPrint;
-            if (withSubmodels) {
-                levelsToPrint = getUsedLanguageLevelsRecursively();
-            } else {
-                levelsToPrint = getUsedLanguageLevels();
-            }
-            for (LanguageLevel languageLevel : getUsedLanguageLevels()) {
-                result.append(Configuration.getTabulatorSymbol());
-                if (LanguageLevel.isMajorLevel(languageLevel)) {
-                } else {
-                    result.append(LanguageLevel.valueOf(languageLevel.getValue() - 1).getFirst().getName());
-                    result.append(".");
-                }
-                result.append(languageLevel.getName());
-                result.append(Configuration.getNewlineSymbol());
-            }
-            result.append(Configuration.getNewlineSymbol());
-        }
-        if (!imports.isEmpty() && !withSubmodels) {
-            result.append("imports");
-            result.append(Configuration.getNewlineSymbol());
-            for (Import importLine : imports) {
-                result.append(Configuration.getTabulatorSymbol());
-                result.append(addNecessaryQuotes(importLine.getNamespace()));
-                if (!importLine.getAlias().equals(importLine.getNamespace())) {
-                    result.append(" as ");
-                    result.append(addNecessaryQuotes(importLine.getAlias()));
-                }
-                result.append(Configuration.getNewlineSymbol());
-            }
-            result.append(Configuration.getNewlineSymbol());
-        }
+
         if (rootFeature != null) {
             result.append("features");
             result.append(Configuration.getNewlineSymbol());
@@ -351,12 +235,6 @@ public class FeatureModel<T extends Feature> {
         List<Constraint> constraintList;
         if (withSubmodels) {
             constraintList = new LinkedList<>(ownConstraints);
-            for (Import importLine : imports) {
-                // only print the constraints of a submodel if the import is actually used
-                if (importLine.isReferenced()) {
-                    constraintList.addAll(importLine.getFeatureModel().getOwnConstraints());
-                }
-            }
         } else {
             constraintList = getOwnConstraints();
         }
@@ -373,45 +251,6 @@ public class FeatureModel<T extends Feature> {
         return result.toString();
     }
 
-    /**
-     * This list exists just for performance reasons when building a decomposed
-     * feature model from several uvl files. This list does not have to be set, when
-     * building your own feature model. It is also not necessary to update this list
-     * when adding for example constraints.
-     *
-     * @return a list with all {@link LiteralConstraint} objects in the constraints
-     *         of this feature model.
-     */
-    public List<LiteralConstraint> getLiteralConstraints() {
-        return literalConstraints;
-    }
-
-    /**
-     * This list exists just for performance reasons when building a decomposed
-     * feature model from several uvl files. This list does not have to be set, when
-     * building your own feature model. It is also not necessary to update this list
-     * when adding for example constraints.
-     *
-     * @return a list with all {@link LiteralExpression} objects in the constraints
-     *         of this feature model.
-     */
-    public List<LiteralExpression> getLiteralExpressions() {
-        return literalExpressions;
-    }
-
-    /**
-     * This list exists just for performance reasons when building a decomposed
-     * feature model from several uvl files. This list does not have to be set, when
-     * building your own feature model. It is also not necessary to update this list
-     * when adding for example constraints.
-     *
-     * @return a list with all {@link AggregateFunctionExpression} objects in the
-     *         constraints of this feature model.
-     */
-    public List<AggregateFunctionExpression> getAggregateFunctionsWithRootFeature() {
-        return aggregateFunctionsWithRootFeature;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof FeatureModel)) {
@@ -424,32 +263,6 @@ public class FeatureModel<T extends Feature> {
 
         if (!this.getRootFeature().equals(((FeatureModel<?>) obj).getRootFeature())) {
             return false;
-        }
-
-
-        if (this.getImports().size() != ((FeatureModel<?>) obj).getImports().size()) {
-            return false;
-        }
-
-        if (this.getUsedLanguageLevels().size() != ((FeatureModel<?>) obj).getUsedLanguageLevels().size()) {
-            return false;
-        }
-
-        for (LanguageLevel languageLevel: this.getUsedLanguageLevels()) {
-            if (!(((FeatureModel<?>) obj).getUsedLanguageLevels().contains(languageLevel))) {
-                return false;
-            }
-        }
-
-        List<Import> objImports = ((FeatureModel<?>) obj).getImports();
-        for (Import thisImport: this.getImports()) {
-            final Optional<Import> identicalImport = objImports.stream()
-                    .filter(imp -> imp.getFeatureModel().equals(thisImport.getFeatureModel()))
-                    .findFirst();
-
-            if (identicalImport.isEmpty()) {
-                return false;
-            }
         }
 
         if (this.getOwnConstraints().size() != ((FeatureModel<?>) obj).getOwnConstraints().size()) {
