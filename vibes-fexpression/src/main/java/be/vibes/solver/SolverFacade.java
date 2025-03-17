@@ -11,6 +11,8 @@ import java.util.Iterator;
 
 public interface SolverFacade {
 
+    public SolverType getType();
+
     /**
      *
      * @param constraint

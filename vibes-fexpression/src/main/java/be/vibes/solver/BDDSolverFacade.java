@@ -105,6 +105,11 @@ public class BDDSolverFacade implements SolverFacade {
     }
 
     @Override
+    public SolverType getType() {
+        return SolverType.BDD;
+    }
+
+    @Override
     public ConstraintIdentifier addConstraint(FExpression constraint)
             throws SolverInitializationException {
         try {

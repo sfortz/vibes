@@ -143,6 +143,11 @@ public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> 
     }
 
     @Override
+    public SolverType getType() {
+        return null;
+    }
+
+    @Override
     public ConstraintIdentifier addConstraint(FExpression constraint)
             throws SolverInitializationException, SolverFatalErrorException {
         logger.trace("Adding expression {} to solver", constraint);
