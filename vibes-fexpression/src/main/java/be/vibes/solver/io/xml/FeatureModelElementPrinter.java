@@ -4,7 +4,7 @@ import be.vibes.fexpression.Feature;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
-import de.vill.model.Group;
+import be.vibes.solver.Group;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.List;

@@ -4,12 +4,13 @@ import be.vibes.solver.FeatureModel;
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
 import be.vibes.fexpression.Feature;
-import de.vill.model.Group;
+import be.vibes.solver.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.List;
+
 
 import static be.vibes.solver.io.xml.FeatureModelHandler.*;
 
@@ -62,7 +63,7 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
             case MANDATORY -> xtw.writeStartElement(MANDATORY_TAG);
             case OPTIONAL -> xtw.writeStartElement(OPTIONAL_TAG);
         }
-        for(de.vill.model.Feature feature: group.getFeatures()){
+        for(Feature feature: group.getFeatures()){
             Feature f = fm.getFeature(feature.getFeatureName());
             printElement(xtw, f);
         }

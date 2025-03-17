@@ -9,21 +9,20 @@ import be.vibes.solver.constraints.RequirementConstraint;
 import be.vibes.solver.exception.FeatureModelDefinitionException;
 import be.vibes.solver.exception.SolverInitializationException;
 import de.vill.exception.ParseError;
-import de.vill.model.Group;
 import de.vill.model.constraint.*;
 
 import java.util.*;
 
-public class XMLFeatureModelFactory {
+public class XMLModelFactory {
 
     private final SolverType solverType;
     private final FeatureModel featureModel;
 
-    public XMLFeatureModelFactory() {
+    public XMLModelFactory() {
         this(SolverType.SAT4J);
     }
 
-    public XMLFeatureModelFactory(SolverType type) {
+    public XMLModelFactory(SolverType type) {
         switch (type) {
             case SAT4J -> this.solverType = SolverType.SAT4J;
             case BDD -> this.solverType = SolverType.BDD;
@@ -40,7 +39,6 @@ public class XMLFeatureModelFactory {
         Feature feature = new Feature(name);
         feature.setParentGroup(null);
         featureModel.getFeatureMap().put(name, feature);
-        featureModel.getNewFeatureMap().put(name, feature);
         featureModel.setRootFeature(feature);
         return feature;
     }
@@ -57,7 +55,6 @@ public class XMLFeatureModelFactory {
         feature.setParentGroup(group);
         group.getFeatures().add(feature);
         featureModel.getFeatureMap().put(name, feature);
-        featureModel.getNewFeatureMap().put(name, feature);
 
 
         return feature;
@@ -77,8 +74,8 @@ public class XMLFeatureModelFactory {
         children.add(f.getFeatureName());
 
         for(Group g: f.getChildren()){
-            for(de.vill.model.Feature child: g.getFeatures()){
-                children.addAll(getRecursiveChildren(Feature.clone(child)));
+            for(Feature child: g.getFeatures()){
+                children.addAll(getRecursiveChildren(child));
             }
         }
         return children;
@@ -217,8 +214,7 @@ public class XMLFeatureModelFactory {
     private List<FExpression> buildFExpression(Group group) {
         List<FExpression> childrenExpressions = new ArrayList<>();
 
-        for (de.vill.model.Feature old : group.getFeatures()) {
-            Feature child = Feature.clone(old);
+        for (Feature child : group.getFeatures()) {
             FExpression childExp = buildFExpression(child);
             childrenExpressions.add(childExp);
         }
