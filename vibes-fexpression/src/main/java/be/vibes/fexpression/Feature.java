@@ -71,7 +71,7 @@ public class Feature extends de.vill.model.Feature {
         feature.setFeatureType(old.getFeatureType());
         feature.getAttributes().putAll(old.getAttributes());
         for (Group group : old.getChildren()) {
-            feature.getChildren().add(group.clone());
+            feature.getChildren().add(group);
         }
         for (Group group : feature.getChildren()) {
             group.setParentFeature(feature);

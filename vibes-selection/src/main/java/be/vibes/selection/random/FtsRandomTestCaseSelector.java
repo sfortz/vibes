@@ -23,7 +23,6 @@ package be.vibes.selection.random;
 import be.vibes.fexpression.FExpression;
 import be.vibes.selection.exception.SinkStateReachedException;
 import be.vibes.solver.ConstraintIdentifier;
-import be.vibes.solver.FeatureModel;
 import be.vibes.solver.SolverFacade;
 import be.vibes.solver.exception.ConstraintSolvingException;
 import be.vibes.solver.exception.SolverInitializationException;

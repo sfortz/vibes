@@ -26,7 +26,6 @@ import be.vibes.selection.random.FtsRandomTestCaseSelector;
 import be.vibes.selection.random.LocalRandomTestCaseSelector;
 import be.vibes.selection.random.RandomTestCaseSelector;
 import be.vibes.selection.random.UsageDrivenRandomSelector;
-import be.vibes.solver.FeatureModel;
 import be.vibes.solver.SolverFacade;
 import be.vibes.ts.*;
 
