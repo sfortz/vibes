@@ -14,22 +14,34 @@ import de.vill.model.constraint.LiteralConstraint;
 
 import java.util.*;
 
-public class XMLModelFactory {
+public class XMLModelFactory<F extends Feature, T extends FeatureModel<F>> {
 
     private final SolverType solverType;
-    private final FeatureModel<Feature> featureModel;
+    private final T featureModel;
 
-    public XMLModelFactory() {
-        this(SolverType.SAT4J);
+    public XMLModelFactory(T featureModel) {
+        this(featureModel, featureModel.getSolver());
     }
 
-    public XMLModelFactory(SolverType type) {
+    private XMLModelFactory(T featureModel, SolverFacade solver) {
+        if(solver == null){
+            this.solverType = SolverType.BDD;
+        }else {
+            this.solverType = solver.getType();
+        }
+        this.featureModel = featureModel;
+    }
+
+
+    public XMLModelFactory(T featureModel, SolverType type) {
+
         switch (type) {
             case SAT4J -> this.solverType = SolverType.SAT4J;
             case BDD -> this.solverType = SolverType.BDD;
-            default -> throw new UnsupportedOperationException("Only SAT4J and BDD solvers are currently supported. Default is SAT4J.");
+            default -> throw new UnsupportedOperationException("Only SAT4J and BDD solvers are currently supported.");
         }
-        this.featureModel = new FeatureModel();
+
+        this.featureModel = featureModel;
     }
 
     public void setNamespace(String namespace) {
@@ -39,23 +51,30 @@ public class XMLModelFactory {
     public Feature setRootFeature(String name) {
         Feature feature = new Feature(name);
         feature.setParentGroup(null);
-        featureModel.getFeatureMap().put(name, feature);
-        featureModel.setRootFeature(feature);
+        featureModel.getFeatureMap().put(name, (F) feature);
+        featureModel.setRootFeature((F) feature);
         return feature;
     }
 
-    public Group addChild(Feature parent, Group.GroupType type) {
-        Group group = new Group(type);
-        parent.addChildren(group);
-        group.setParentFeature(parent);
-        return group;
+    /*
+    public abstract F setRootFeature(String name);
+    public abstract F addFeature(Group group, String name);
+
+    protected void addFeature(F feature, Group group, String name) {
+        feature.setParentGroup(group);
+        featureModel.getFeatureMap().put(name, feature);
+        featureModel.setRootFeature(feature);
+    }
+*/
+    protected F getFeature(String name){
+        return this.featureModel.getFeature(name);
     }
 
     public Feature addFeature(Group group, String name) {
         Feature feature = new Feature(name);
         feature.setParentGroup(group);
         group.getFeatures().add(feature);
-        featureModel.getFeatureMap().put(name, feature);
+        featureModel.getFeatureMap().put(name, (F) feature);
 
 
         return feature;
@@ -70,27 +89,34 @@ public class XMLModelFactory {
         return features;
     }
 
-    private Set<String> getRecursiveChildren(Feature f) {
+    public Group addChild(F parent, Group.GroupType type) {
+        Group group = new Group(type);
+        parent.addChildren(group);
+        group.setParentFeature(parent);
+        return group;
+    }
+
+    private Set<String> getRecursiveChildren(F f) {
         Set<String> children = new HashSet<>();
         children.add(f.getFeatureName());
 
         for(Group g: f.getChildren()){
             for(Feature child: g.getFeatures()){
-                children.addAll(getRecursiveChildren(child));
+                children.addAll(getRecursiveChildren((F) child));
             }
         }
         return children;
     }
 
-    public ExclusionConstraint addExclusionConstraint(Feature lca, String f1, String f2) {
+    public ExclusionConstraint addExclusionConstraint(F lca, String f1, String f2) {
         return addConstraint(lca, f1, f2, "Exclusion");
     }
 
-    public RequirementConstraint addRequirementConstraint(Feature lca, String feature, String dependency) {
+    public RequirementConstraint addRequirementConstraint(F lca, String feature, String dependency) {
         return addConstraint(lca, dependency, feature, "Requirement");
     }
 
-    private <T extends Constraint> T addConstraint(Feature lca, String f1, String f2, String type) {
+    private <C extends Constraint> C addConstraint(F lca, String f1, String f2, String type) {
 
         if(featureModel.getFeature(lca.getFeatureName()) == null){
             throw new FeatureModelDefinitionException( "Impossible to add the new " + type
@@ -118,13 +144,13 @@ public class XMLModelFactory {
                 ExclusionConstraint constraint = new ExclusionConstraint(c1, c2);
                 lca.getExclusions().add(constraint);
                 featureModel.getOwnConstraints().add(constraint);
-                return (T) constraint;
+                return (C) constraint;
             }
             case "Requirement":
                 RequirementConstraint constraint = new RequirementConstraint(c1, c2);
                 lca.getRequirements().add(constraint);
                 featureModel.getOwnConstraints().add(constraint);
-                return (T) constraint;
+                return (C) constraint;
             default: throw new FeatureModelDefinitionException("Unknown type of constraints!");
         }
     }
@@ -164,7 +190,7 @@ public class XMLModelFactory {
         return constraint;
     }*/
 
-    private FExpression buildFExpression(Feature feature) {
+    private FExpression buildFExpression(F feature) {
 
         FExpression featureExpression = FExpression.featureExpr(feature.getFeatureName());
 
@@ -216,7 +242,7 @@ public class XMLModelFactory {
         List<FExpression> childrenExpressions = new ArrayList<>();
 
         for (Feature child : group.getFeatures()) {
-            FExpression childExp = buildFExpression(child);
+            FExpression childExp = buildFExpression((F) child);
             childrenExpressions.add(childExp);
         }
 
@@ -240,7 +266,7 @@ public class XMLModelFactory {
                 featureExpression = (left.or(right)).and(left.not().or(right.not()));
             }
             case LiteralConstraint c -> {
-                Feature f = featureModel.getFeature(c.getLiteral());
+                F f = featureModel.getFeature(c.getLiteral());
                 featureExpression = FExpression.featureExpr(f);
             }/*
             case ImplicationConstraint c ->  {
@@ -286,7 +312,7 @@ public class XMLModelFactory {
         return solver;
     }
 
-    public FeatureModel<?> build() {
+    public  T build() {
         FExpression fexp = buildFExpression(featureModel.getRootFeature());
 
         for(Constraint constr: featureModel.getOwnConstraints()){
