@@ -8,7 +8,6 @@ import be.vibes.solver.*;
 import be.vibes.solver.exception.SolverInitializationException;
 import de.vill.exception.ParseError;
 import de.vill.exception.ParseErrorList;
-import de.vill.model.FeatureType;
 import de.vill.model.LanguageLevel;
 import de.vill.model.constraint.*;
 import de.vill.model.expression.*;
@@ -22,7 +21,7 @@ public class UVLListener extends UVLJavaBaseListener {
     private final FeatureModel<Feature> featureModel;
     private final Set<LanguageLevel> importedLanguageLevels = new HashSet<>(List.of(LanguageLevel.BOOLEAN_LEVEL));
     private final Stack<Feature> featureStack = new Stack<>();
-    private final Stack<Group> groupStack = new Stack<>();
+    private final Stack<Group<Feature>> groupStack = new Stack<>();
 
     private final Stack<FExpression> constraintStack = new Stack<>();
 
@@ -91,12 +90,12 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterFeatures(UVLJavaParser.FeaturesContext ctx) {
-        groupStack.push(new Group(Group.GroupType.MANDATORY));
+        groupStack.push(new Group<>(Group.GroupType.MANDATORY));
     }
 
     @Override
     public void exitFeatures(UVLJavaParser.FeaturesContext ctx) {
-        Group group = groupStack.pop();
+        Group<Feature> group = groupStack.pop();
         Feature feature = group.getFeatures().getFirst();
         featureModel.setRootFeature(feature);
         feature.setParentGroup(null);
@@ -104,7 +103,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterOrGroup(UVLJavaParser.OrGroupContext ctx) {
-        Group group = new Group(Group.GroupType.OR);
+        Group<Feature> group = new Group<>(Group.GroupType.OR);
         Feature feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
@@ -122,7 +121,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterAlternativeGroup(UVLJavaParser.AlternativeGroupContext ctx) {
-        Group group = new Group(Group.GroupType.ALTERNATIVE);
+        Group<Feature> group = new Group<>(Group.GroupType.ALTERNATIVE);
         Feature feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
@@ -142,7 +141,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterOptionalGroup(UVLJavaParser.OptionalGroupContext ctx) {
-        Group group = new Group(Group.GroupType.OPTIONAL);
+        Group<Feature> group = new Group<>(Group.GroupType.OPTIONAL);
         Feature feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
@@ -159,7 +158,7 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterMandatoryGroup(UVLJavaParser.MandatoryGroupContext ctx) {
-        Group group = new Group(Group.GroupType.MANDATORY);
+        Group<Feature> group = new Group<>(Group.GroupType.MANDATORY);
         Feature feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
@@ -201,7 +200,7 @@ public class UVLListener extends UVLJavaBaseListener {
         }
 
         featureStack.push(feature);
-        Group parentGroup = groupStack.peek();
+        Group<Feature> parentGroup = groupStack.peek();
         parentGroup.getFeatures().add(feature);
         feature.setParentGroup(parentGroup);
         if (featureNamespace == null) {

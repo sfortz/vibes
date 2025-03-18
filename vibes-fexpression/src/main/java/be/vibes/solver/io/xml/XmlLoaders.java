@@ -1,5 +1,6 @@
 package be.vibes.solver.io.xml;
 
+import be.vibes.fexpression.Feature;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.exception.FeatureModelDefinitionException;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ public class XmlLoaders {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlLoaders.class);
 
-    public static FeatureModel loadFeatureModel(InputStream in) throws FeatureModelDefinitionException {
+    public static FeatureModel<? extends Feature> loadFeatureModel(InputStream in) throws FeatureModelDefinitionException {
         FeatureModelHandler handler = new FeatureModelHandler();
         try {
             XmlReader reader = new XmlReader(handler, in);
@@ -27,7 +28,7 @@ public class XmlLoaders {
         return handler.getFeatureModel();
     }
 
-    public static FeatureModel loadFeatureModel(File xmlFile) throws FeatureModelDefinitionException {
+    public static FeatureModel<? extends Feature> loadFeatureModel(File xmlFile) throws FeatureModelDefinitionException {
         try {
             return XmlLoaders.loadFeatureModel(new FileInputStream(xmlFile));
         } catch (FileNotFoundException e) {
@@ -36,7 +37,7 @@ public class XmlLoaders {
         }
     }
 
-    public static FeatureModel loadFeatureModel(String xmlFile) throws FeatureModelDefinitionException {
+    public static FeatureModel<? extends Feature> loadFeatureModel(String xmlFile) throws FeatureModelDefinitionException {
         return XmlLoaders.loadFeatureModel(new File(xmlFile));
     }
 

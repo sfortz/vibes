@@ -13,7 +13,7 @@ import java.util.ListIterator;
  * This class represents all kinds of groups (or, alternative, mandatory,
  * optional, cardinality)
  */
-public class Group {
+public class Group<F extends Feature> {
     /**
      * An enum with all possible group types.
      */
@@ -24,10 +24,10 @@ public class Group {
     /// The type of the group (if type is GROUP_CARDINALITY or FEATURE_CARDINALITY
     /// lower and upper bound must be set!)
     public GroupType GROUPTYPE;
-    private final List<Feature> features;
+    private final List<F> features;
     private String lowerBound;
     private String upperBound;
-    private Feature parent;
+    private F parent;
 
     /**
      * The constructor of the group class.
@@ -36,14 +36,14 @@ public class Group {
      */
     public Group(GroupType groupType) {
         this.GROUPTYPE = groupType;
-        features = new LinkedList<Feature>() {
+        features = new LinkedList<F>() {
             /**
              *
              */
             private static final long serialVersionUID = 3856024708694486586L;
 
             @Override
-            public boolean add(Feature e) {
+            public boolean add(F e) {
                 if (super.add(e)) {
                     e.setParentGroup(Group.this);
                     return true;
@@ -52,14 +52,14 @@ public class Group {
             }
 
             @Override
-            public void add(int index, Feature element) {
+            public void add(int index, F element) {
                 super.set(index, element);
                 element.setParentGroup(Group.this);
             }
 
             @Override
-            public Feature remove(int index) {
-                Feature f = super.remove(index);
+            public F remove(int index) {
+                F f = super.remove(index);
                 f.setParentGroup(null);
                 return f;
             }
@@ -67,14 +67,14 @@ public class Group {
             @Override
             public boolean remove(Object o) {
                 if (super.remove(o)) {
-                    ((Feature) o).setParentGroup(null);
+                    ((F) o).setParentGroup(null);
                     return true;
                 }
                 return false;
             }
 
             @Override
-            public boolean addAll(int index, Collection<? extends Feature> c) {
+            public boolean addAll(int index, Collection<? extends F> c) {
                 if (super.addAll(index, c)) {
                     c.forEach(e -> e.setParentGroup(Group.this));
                     return true;
@@ -84,7 +84,7 @@ public class Group {
 
             @Override
             public void clear() {
-                ListIterator<Feature> it = this.listIterator();
+                ListIterator<F> it = this.listIterator();
                 while (it.hasNext()) {
                     it.next().setParentGroup(null);
                 }
@@ -92,8 +92,8 @@ public class Group {
             }
 
             @Override
-            public Feature set(int index, Feature element) {
-                Feature f;
+            public F set(int index, F element) {
+                F f;
                 if ((f = super.set(index, element)) != null) {
                     f.setParentGroup(Group.this);
                     return f;
@@ -101,11 +101,11 @@ public class Group {
                 return null;
             }
 
-            class FeatureIterator implements ListIterator<Feature> {
-                private ListIterator<Feature> itr;
-                Feature lastReturned;
+            class FeatureIterator implements ListIterator<F> {
+                private ListIterator<F> itr;
+                F lastReturned;
 
-                public FeatureIterator(ListIterator<Feature> itr) {
+                public FeatureIterator(ListIterator<F> itr) {
                     this.itr = itr;
                 }
 
@@ -115,7 +115,7 @@ public class Group {
                 }
 
                 @Override
-                public Feature next() {
+                public F next() {
                     lastReturned = itr.next();
                     return lastReturned;
                 }
@@ -126,7 +126,7 @@ public class Group {
                 }
 
                 @Override
-                public Feature previous() {
+                public F previous() {
                     lastReturned = itr.previous();
                     return lastReturned;
                 }
@@ -148,14 +148,14 @@ public class Group {
                 }
 
                 @Override
-                public void set(Feature e) {
+                public void set(F e) {
                     itr.set(e);
                     lastReturned.setParentGroup(null);
                     e.setParentGroup(Group.this);
                 }
 
                 @Override
-                public void add(Feature e) {
+                public void add(F e) {
                     itr.add(e);
                     e.setParentGroup(Group.this);
                 }
@@ -163,7 +163,7 @@ public class Group {
             }
 
             @Override
-            public ListIterator<Feature> listIterator(int index) {
+            public ListIterator<F> listIterator(int index) {
                 return new FeatureIterator(super.listIterator(index));
             }
 
@@ -218,7 +218,7 @@ public class Group {
      *
      * @return A list with all child features.
      */
-    public List<Feature> getFeatures() {
+    public List<F> getFeatures() {
         return features;
     }
 
@@ -256,7 +256,7 @@ public class Group {
 
         result.append(Configuration.getNewlineSymbol());
 
-        for (Feature feature : features) {
+        for (F feature : features) {
             result.append(Util.indentEachLine(feature.toString(withSubmodels, currentAlias)));
         }
 
@@ -278,14 +278,14 @@ public class Group {
     }
 
     @Override
-    public Group clone() {
-        Group group = new Group(GROUPTYPE);
+    public Group<F> clone() {
+        Group<F> group = new Group<>(GROUPTYPE);
         group.setUpperBound(getUpperBound());
         group.setLowerBound(getLowerBound());
-        for (Feature feature : getFeatures()) {
-            group.getFeatures().add(feature.clone());
+        for (F feature : getFeatures()) {
+            group.getFeatures().add((F) feature.clone());
         }
-        for (Feature feature : group.getFeatures()) {
+        for (F feature : group.getFeatures()) {
             feature.setParentGroup(group);
         }
         return group;
@@ -296,7 +296,7 @@ public class Group {
      *
      * @return Parent Feature of the group.
      */
-    public Feature getParentFeature() {
+    public F getParentFeature() {
         return parent;
     }
 
@@ -305,7 +305,7 @@ public class Group {
      *
      * @param parent The parent feature of the group.
      */
-    public void setParentFeature(Feature parent) {
+    public void setParentFeature(F parent) {
         this.parent = parent;
     }
 
@@ -315,24 +315,24 @@ public class Group {
             return false;
         }
 
-        if (this.GROUPTYPE != ((Group) obj).GROUPTYPE) {
+        if (this.GROUPTYPE != ((Group<F>) obj).GROUPTYPE) {
             return false;
         }
 
-        if (this.getUpperBound() != null && !(this.getUpperBound().equals(((Group) obj).getUpperBound()))) {
+        if (this.getUpperBound() != null && !(this.getUpperBound().equals(((Group<F>) obj).getUpperBound()))) {
             return false;
         }
 
-        if (this.getLowerBound() != null && !(this.getLowerBound().equals(((Group) obj).getLowerBound()))) {
+        if (this.getLowerBound() != null && !(this.getLowerBound().equals(((Group<F>) obj).getLowerBound()))) {
             return false;
         }
 
-        if (this.getFeatures().size() != ((Group) obj).getFeatures().size()) {
+        if (this.getFeatures().size() != ((Group<F>) obj).getFeatures().size()) {
             return false;
         }
 
-        final List<Feature> objFeatures = ((Group) obj).getFeatures();
-        for (final Feature currentFeature : this.getFeatures()) {
+        final List<F> objFeatures = ((Group<F>) obj).getFeatures();
+        for (final F currentFeature : this.getFeatures()) {
             if (!objFeatures.contains(currentFeature)) {
                 return false;
             }

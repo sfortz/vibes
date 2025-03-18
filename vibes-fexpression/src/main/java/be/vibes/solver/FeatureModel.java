@@ -173,7 +173,7 @@ public class FeatureModel<T extends Feature> {
         if (featureConstraintList != null) {
             featureConstraints.addAll(featureConstraintList.getValue());
         }
-        for (Group childGroup : feature.getChildren()) {
+        for (Group<T> childGroup : feature.getChildren()) {
             for (Feature childFeature : childGroup.getFeatures()) {
                 if (!childFeature.isSubmodelRoot()) {
                     featureConstraints.addAll(getFeatureConstraints((T) childFeature));
@@ -361,7 +361,7 @@ public class FeatureModel<T extends Feature> {
         return null;
     }
 
-    public T leastCommonAncestor (List<FExpression> fExpressions){
+    public T getLeastCommonAncestor (List<FExpression> fExpressions){
 
         FExpression disjunction = FExpression.falseValue();
 

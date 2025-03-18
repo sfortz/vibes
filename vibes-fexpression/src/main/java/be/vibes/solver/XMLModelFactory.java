@@ -48,18 +48,14 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
         featureModel.setNamespace(namespace);
     }
 
-    public T getFeatureModel() {
-        return featureModel;
-    }
-
-    protected Feature setRootFeature(F feature, String name) {
+    protected F setRootFeature(F feature, String name) {
         feature.setParentGroup(null);
         featureModel.getFeatureMap().put(name, feature);
         featureModel.setRootFeature(feature);
         return feature;
     }
 
-    protected Feature addFeature(F feature, Group group, String name) {
+    protected F addFeature(F feature, Group<F> group, String name) {
         feature.setParentGroup(group);
         group.getFeatures().add(feature);
         featureModel.getFeatureMap().put(name, feature);
@@ -70,8 +66,8 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
         return this.featureModel.getFeature(name);
     }
 
-    public Group addChild(F parent, Group.GroupType type) {
-        Group group = new Group(type);
+    public Group<F> addChild(F parent, Group.GroupType type) {
+        Group<F> group = new Group<F>(type);
         parent.addChildren(group);
         group.setParentFeature(parent);
         return group;
@@ -81,8 +77,8 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
         Set<String> children = new HashSet<>();
         children.add(f.getFeatureName());
 
-        for(Group g: f.getChildren()){
-            for(Feature child: g.getFeatures()){
+        for(Group<F> g: f.getChildren()){
+            for(F child: g.getFeatures()){
                 children.addAll(getRecursiveChildren((F) child));
             }
         }
@@ -175,7 +171,7 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
 
         FExpression featureExpression = FExpression.featureExpr(feature.getFeatureName());
 
-        for(Group group : feature.getChildren()){
+        for(Group<F> group : feature.getChildren()){
 
             FExpression groupExpression = null;
             List<FExpression> childrenExpressions = buildFExpression(group);
@@ -219,11 +215,11 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
         return featureExpression;
     }
 
-    private List<FExpression> buildFExpression(Group group) {
+    private List<FExpression> buildFExpression(Group<F> group) {
         List<FExpression> childrenExpressions = new ArrayList<>();
 
-        for (Feature child : group.getFeatures()) {
-            FExpression childExp = buildFExpression((F) child);
+        for (F child : group.getFeatures()) {
+            FExpression childExp = buildFExpression(child);
             childrenExpressions.add(childExp);
         }
 

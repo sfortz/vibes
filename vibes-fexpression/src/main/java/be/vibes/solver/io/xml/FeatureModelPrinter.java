@@ -63,10 +63,12 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
             case MANDATORY -> xtw.writeStartElement(MANDATORY_TAG);
             case OPTIONAL -> xtw.writeStartElement(OPTIONAL_TAG);
         }
-        for(Feature feature: group.getFeatures()){
+
+        for (Feature feature : (List<Feature>) group.getFeatures()) {
             Feature f = fm.getFeature(feature.getFeatureName());
             printElement(xtw, f);
         }
+
         xtw.writeEndElement();
     }
 
