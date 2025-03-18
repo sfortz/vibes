@@ -48,38 +48,26 @@ public class XMLModelFactory<F extends Feature, T extends FeatureModel<F>> {
         featureModel.setNamespace(namespace);
     }
 
-    public Feature setRootFeature(String name) {
-        Feature feature = new Feature(name);
-        feature.setParentGroup(null);
-        featureModel.getFeatureMap().put(name, (F) feature);
-        featureModel.setRootFeature((F) feature);
-        return feature;
-    }
-
     public T getFeatureModel() {
         return featureModel;
     }
 
-    /*
-        public abstract F setRootFeature(String name);
-        public abstract F addFeature(Group group, String name);
-
-        protected void addFeature(F feature, Group group, String name) {
-            feature.setParentGroup(group);
-            featureModel.getFeatureMap().put(name, feature);
-            featureModel.setRootFeature(feature);
-        }
-    */
-    protected F getFeature(String name){
-        return this.featureModel.getFeature(name);
+    protected Feature setRootFeature(F feature, String name) {
+        feature.setParentGroup(null);
+        featureModel.getFeatureMap().put(name, feature);
+        featureModel.setRootFeature(feature);
+        return feature;
     }
 
-    public Feature addFeature(Group group, String name) {
-        Feature feature = new Feature(name);
+    protected Feature addFeature(F feature, Group group, String name) {
         feature.setParentGroup(group);
         group.getFeatures().add(feature);
-        featureModel.getFeatureMap().put(name, (F) feature);
+        featureModel.getFeatureMap().put(name, feature);
         return feature;
+    }
+
+    protected F getFeature(String name){
+        return this.featureModel.getFeature(name);
     }
 
     public Group addChild(F parent, Group.GroupType type) {
