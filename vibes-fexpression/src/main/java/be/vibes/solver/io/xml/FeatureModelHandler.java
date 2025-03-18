@@ -1,9 +1,10 @@
 package be.vibes.solver.io.xml;
 
 import be.vibes.fexpression.Feature;
+import be.vibes.solver.FeatureModelFactory;
 import be.vibes.solver.Group;
 import be.vibes.solver.FeatureModel;
-import be.vibes.solver.XMLModelFactory;
+import be.vibes.solver.SolverType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.namespace.QName;
@@ -36,7 +37,7 @@ public class FeatureModelHandler implements XmlEventHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureModelHandler.class);
 
-    protected XMLModelFactory factory;
+    private final FeatureModelFactory factory;
     protected String charValue;
 
     // Stack to track FM depth
@@ -44,10 +45,10 @@ public class FeatureModelHandler implements XmlEventHandler {
     protected Stack<Feature> featureStack = new Stack<>();
 
     public FeatureModelHandler() {
-        this.factory = new XMLModelFactory();
+        this.factory = new FeatureModelFactory(SolverType.BDD);
     }
 
-    public FeatureModel getFeatureModel() {
+    public FeatureModel<? extends Feature> getFeatureModel() {
         return this.factory.build();
     }
 
