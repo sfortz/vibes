@@ -14,7 +14,7 @@ import de.vill.model.constraint.LiteralConstraint;
 
 import java.util.*;
 
-public class XMLModelFactory<F extends Feature, T extends FeatureModel<F>> {
+public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<F>> {
 
     private final SolverType solverType;
     private final T featureModel;
