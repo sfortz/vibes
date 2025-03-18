@@ -67,7 +67,7 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
     }
 
     public Group<F> addChild(F parent, Group.GroupType type) {
-        Group<F> group = new Group<F>(type);
+        Group<F> group = new Group<>(type);
         parent.addChildren(group);
         group.setParentFeature(parent);
         return group;
