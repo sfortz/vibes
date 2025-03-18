@@ -62,7 +62,7 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
         return feature;
     }
 
-    protected F getFeature(String name){
+    public F getFeature(String name){
         return this.featureModel.getFeature(name);
     }
 
@@ -290,13 +290,17 @@ public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<
     }
 
     public  T build() {
-        FExpression fexp = buildFExpression(featureModel.getRootFeature());
+        
+        if(featureModel.getSolver() == null){
+            FExpression fexp = buildFExpression(featureModel.getRootFeature());
 
-        for(Constraint constr: featureModel.getOwnConstraints()){
-            fexp.andWith(buildFExpression(constr));
+            for(Constraint constr: featureModel.getOwnConstraints()){
+                fexp.andWith(buildFExpression(constr));
+            }
+
+            featureModel.setSolver(getSolverFacade(fexp));
         }
 
-        featureModel.setSolver(getSolverFacade(fexp));
         return featureModel;
     }
 
