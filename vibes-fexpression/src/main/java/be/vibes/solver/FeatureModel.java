@@ -40,15 +40,6 @@ public class FeatureModel<T extends Feature> {
         this.solver = solver;
     }
 
-    public FeatureModel(FeatureModel<T> fm) {
-        super();
-        this.featureMap.putAll(fm.featureMap);
-        this.ownConstraints.addAll(fm.ownConstraints);
-        this.namespace = fm.namespace;
-        this.solver = fm.solver;
-        this.rootFeature = fm.rootFeature;
-    }
-
     public void setSolver(SolverFacade solver) {
         if(this.solver == null){
             this.solver = solver;

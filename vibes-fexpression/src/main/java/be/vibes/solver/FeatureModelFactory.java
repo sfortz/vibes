@@ -17,7 +17,7 @@ public class FeatureModelFactory extends XMLModelFactory<Feature, FeatureModel<F
         return setRootFeature(feature, name);
     }
 
-    public Feature addFeature(Group group, String name){
+    public Feature addFeature(Group<Feature> group, String name){
         Feature feature = new Feature(name);
         return addFeature(feature, group, name);
     }

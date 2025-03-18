@@ -41,14 +41,14 @@ public class FeatureModelHandler implements XmlEventHandler {
     protected String charValue;
 
     // Stack to track FM depth
-    protected Stack<Group> groupStack = new Stack<>();
+    protected Stack<Group<Feature>> groupStack = new Stack<>();
     protected Stack<Feature> featureStack = new Stack<>();
 
     public FeatureModelHandler() {
         this.factory = new FeatureModelFactory(SolverType.BDD);
     }
 
-    public FeatureModel<? extends Feature> getFeatureModel() {
+    public FeatureModel<Feature> getFeatureModel() {
         return this.factory.build();
     }
 
@@ -150,24 +150,24 @@ public class FeatureModelHandler implements XmlEventHandler {
 
     protected void handleStartOptionalTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing optional group");
-        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OPTIONAL);
+        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OPTIONAL);
         groupStack.push(currentGroup);
     }
     protected void handleStartMandatoryTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing mandatory group");
-        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.MANDATORY);
+        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.MANDATORY);
         groupStack.push(currentGroup);
     }
 
     protected void handleStartOrTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing or group");
-        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OR);
+        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OR);
         groupStack.push(currentGroup);
     }
 
     protected void handleStartAlternativeTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing alternative group");
-        Group currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.ALTERNATIVE);
+        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.ALTERNATIVE);
         groupStack.push(currentGroup);
     }
 
