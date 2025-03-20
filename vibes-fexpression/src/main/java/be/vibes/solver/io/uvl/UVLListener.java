@@ -17,11 +17,11 @@ import uvl.UVLJavaParser;
 
 import java.util.*;
 
-public class UVLListener extends UVLJavaBaseListener {
-    private final FeatureModel<Feature> featureModel;
+public class UVLListener<F extends Feature<F>> extends UVLJavaBaseListener {
+    private final FeatureModel<F> featureModel;
     private final Set<LanguageLevel> importedLanguageLevels = new HashSet<>(List.of(LanguageLevel.BOOLEAN_LEVEL));
-    private final Stack<Feature> featureStack = new Stack<>();
-    private final Stack<Group<Feature>> groupStack = new Stack<>();
+    private final Stack<F> featureStack = new Stack<>();
+    private final Stack<Group<F>> groupStack = new Stack<>();
 
     private final Stack<FExpression> constraintStack = new Stack<>();
 
@@ -33,14 +33,12 @@ public class UVLListener extends UVLJavaBaseListener {
     private final SolverType solverType;
 
     public UVLListener(){
-        super();
-        this.featureModel = new FeatureModel<>();
-        this.solverType = SolverType.SAT4J;
+        this(SolverType.SAT4J);;
     }
 
     public UVLListener(SolverType type){
         super();
-        this.featureModel = new FeatureModel<>();
+        this.featureModel = new FeatureModelFactory(type).build();
         this.solverType = type;
     }
 
@@ -95,16 +93,16 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void exitFeatures(UVLJavaParser.FeaturesContext ctx) {
-        Group<Feature> group = groupStack.pop();
-        Feature feature = group.getFeatures().getFirst();
+        Group<F> group = groupStack.pop();
+        F feature = group.getFeatures().getFirst();
         featureModel.setRootFeature(feature);
         feature.setParentGroup(null);
     }
 
     @Override
     public void enterOrGroup(UVLJavaParser.OrGroupContext ctx) {
-        Group<Feature> group = new Group<>(Group.GroupType.OR);
-        Feature feature = featureStack.peek();
+        Group<F> group = new Group<>(Group.GroupType.OR);
+        F feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
         groupStack.push(group);
@@ -121,8 +119,8 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterAlternativeGroup(UVLJavaParser.AlternativeGroupContext ctx) {
-        Group<Feature> group = new Group<>(Group.GroupType.ALTERNATIVE);
-        Feature feature = featureStack.peek();
+        Group<F> group = new Group<>(Group.GroupType.ALTERNATIVE);
+        F feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
         groupStack.push(group);
@@ -141,8 +139,8 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterOptionalGroup(UVLJavaParser.OptionalGroupContext ctx) {
-        Group<Feature> group = new Group<>(Group.GroupType.OPTIONAL);
-        Feature feature = featureStack.peek();
+        Group<F> group = new Group<>(Group.GroupType.OPTIONAL);
+        F feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
         groupStack.push(group);
@@ -158,8 +156,8 @@ public class UVLListener extends UVLJavaBaseListener {
 
     @Override
     public void enterMandatoryGroup(UVLJavaParser.MandatoryGroupContext ctx) {
-        Group<Feature> group = new Group<>(Group.GroupType.MANDATORY);
-        Feature feature = featureStack.peek();
+        Group<F> group = new Group<>(Group.GroupType.MANDATORY);
+        F feature = featureStack.peek();
         feature.addChildren(group);
         group.setParentFeature(feature);
         groupStack.push(group);
@@ -189,7 +187,7 @@ public class UVLListener extends UVLJavaBaseListener {
             featureNamespace = null;
         }
 
-        Feature feature = new Feature(featureName);
+        F feature = (F) new Feature<>(featureName);
         if (featureNamespace != null) {
             feature.setNameSpace(featureNamespace);
             feature.setSubmodelRoot(true);
@@ -200,7 +198,7 @@ public class UVLListener extends UVLJavaBaseListener {
         }
 
         featureStack.push(feature);
-        Group<Feature> parentGroup = groupStack.peek();
+        Group<F> parentGroup = groupStack.peek();
         parentGroup.getFeatures().add(feature);
         feature.setParentGroup(parentGroup);
         if (featureNamespace == null) {
@@ -239,7 +237,7 @@ public class UVLListener extends UVLJavaBaseListener {
             //throw new ParseError("Feature Cardinality must not have * as upper bound! (" + ctx.CARDINALITY().getText() + ")");
         }
 
-        Feature feature = featureStack.peek();
+        Feature<F> feature = featureStack.peek();
         feature.setLowerBound(lowerBound);
         feature.setUpperBound(upperBound);
     }
@@ -460,7 +458,7 @@ public class UVLListener extends UVLJavaBaseListener {
         return constraintStack.pop();
     }
 
-    public FeatureModel<Feature> getFeatureModel() {
+    public FeatureModel<F> getFeatureModel() {
         if (!errorList.isEmpty()) {
             ParseErrorList parseErrorList = new ParseErrorList("Multiple Errors occurred during parsing!");
             parseErrorList.getErrorList().addAll(errorList);

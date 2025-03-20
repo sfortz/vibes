@@ -14,7 +14,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import java.util.Stack;
 
-public class FeatureModelHandler implements XmlEventHandler {
+public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandler {
     public static final String FM_TAG = "fm";
     public static final String FEATURE_TAG = "feature";
     public static final String OPTIONAL_TAG = "optional";
@@ -37,18 +37,18 @@ public class FeatureModelHandler implements XmlEventHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureModelHandler.class);
 
-    private final FeatureModelFactory factory;
+    private final FeatureModelFactory<F>  factory;
     protected String charValue;
 
     // Stack to track FM depth
-    protected Stack<Group<Feature>> groupStack = new Stack<>();
-    protected Stack<Feature> featureStack = new Stack<>();
+    protected Stack<Group<F>> groupStack = new Stack<>();
+    protected Stack<F> featureStack = new Stack<>();
 
     public FeatureModelHandler() {
-        this.factory = new FeatureModelFactory(SolverType.BDD);
+        this.factory = new FeatureModelFactory<>(SolverType.BDD);
     }
 
-    public FeatureModel<Feature> getFeatureModel() {
+    public FeatureModel<F> getFeatureModel() {
         return this.factory.build();
     }
 
@@ -138,7 +138,7 @@ public class FeatureModelHandler implements XmlEventHandler {
         LOG.trace("Processing feature");
         String featureName = element.getAttributeByName(QName.valueOf(NAME_ATTR)).getValue();
 
-        Feature currentFeature;
+        F currentFeature;
 
         if (groupStack.isEmpty()){
             currentFeature = factory.setRootFeature(featureName);
@@ -150,24 +150,24 @@ public class FeatureModelHandler implements XmlEventHandler {
 
     protected void handleStartOptionalTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing optional group");
-        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OPTIONAL);
+        Group<F> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OPTIONAL);
         groupStack.push(currentGroup);
     }
     protected void handleStartMandatoryTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing mandatory group");
-        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.MANDATORY);
+        Group<F> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.MANDATORY);
         groupStack.push(currentGroup);
     }
 
     protected void handleStartOrTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing or group");
-        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OR);
+        Group<F> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.OR);
         groupStack.push(currentGroup);
     }
 
     protected void handleStartAlternativeTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing alternative group");
-        Group<Feature> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.ALTERNATIVE);
+        Group<F> currentGroup = factory.addChild(featureStack.peek(), Group.GroupType.ALTERNATIVE);
         groupStack.push(currentGroup);
     }
 
