@@ -40,13 +40,13 @@ public class UVLModelFactory {
      * @return A {@link FeatureModel} based on the uvl text
      * @throws ParseError If there is an error during parsing or the construction of the feature model
      */
-    public FeatureModel parse(String text) throws ParseError {
-        FeatureModel featureModel = parseFeatureModel(text);
+    public FeatureModel<?> parse(String text) throws ParseError {
+        FeatureModel<?> featureModel = parseFeatureModel(text);
         validateTypeLevelConstraints(featureModel);
         return featureModel;
     }
 
-    private FeatureModel parseFeatureModel(String text) {
+    private FeatureModel<?> parseFeatureModel(String text) {
         //remove leading and trailing spaces (to be more robust)
         text = text.trim();
         UVLJavaLexer UVLJavaLexer = new UVLJavaLexer(CharStreams.fromString(text));
@@ -74,7 +74,7 @@ public class UVLModelFactory {
         UVLListener uvlListener = new UVLListener(this.solverType);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(uvlListener, UVLJavaParser.featureModel());
-        FeatureModel featureModel = null;
+        FeatureModel<?> featureModel = null;
 
         try {
             featureModel = uvlListener.getFeatureModel();
@@ -91,7 +91,7 @@ public class UVLModelFactory {
         return featureModel;
     }
 
-    private void validateTypeLevelConstraints(final FeatureModel featureModel) {
+    private void validateTypeLevelConstraints(final FeatureModel<?> featureModel) {
         final List<Constraint> constraints = featureModel.getOwnConstraints();
         for (final Constraint constraint: constraints) {
             if (!validateTypeLevelConstraint(constraint)) {
