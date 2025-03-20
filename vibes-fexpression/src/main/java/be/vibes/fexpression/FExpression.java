@@ -2,20 +2,11 @@ package be.vibes.fexpression;
 
 import be.vibes.fexpression.configuration.Configuration;
 import be.vibes.fexpression.exception.FExpressionException;
-import com.bpodgursky.jbool_expressions.Expression;
-import com.bpodgursky.jbool_expressions.Variable;
-import com.bpodgursky.jbool_expressions.And;
-import com.bpodgursky.jbool_expressions.ExprUtil;
-import com.bpodgursky.jbool_expressions.Literal;
-import com.bpodgursky.jbool_expressions.Or;
-import com.bpodgursky.jbool_expressions.Not;
+import com.bpodgursky.jbool_expressions.*;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.Map;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /*
  * #%L
@@ -192,8 +183,57 @@ public class FExpression {
 
     @Override
     public String toString() {
-        return expression.toString().replace("&", "&&").replace("|", "||");
+        try {
+            return accept(new FExpressionToString()).toString();
+        } catch (FExpressionException e) {
+            throw new RuntimeException("Error while converting FExpression to string", e);
+        }
     }
+
+    private static class FExpressionToString implements FExpressionVisitorWithReturn<StringBuilder> {
+
+        @Override
+        public StringBuilder constant(boolean value) {
+            return new StringBuilder(value ? "true" : "false");
+        }
+
+        @Override
+        public StringBuilder feature(Feature<?> feature) {
+            return new StringBuilder(feature.getFeatureName());
+        }
+
+        @Override
+        public StringBuilder not(FExpression expr) throws FExpressionException {
+            return new StringBuilder("!").append(expr.accept(this));
+        }
+
+        @Override
+        public StringBuilder and(List<FExpression> operands) throws FExpressionException {
+            return joinExpressions(operands, " && ");
+        }
+
+        @Override
+        public StringBuilder or(List<FExpression> operands) throws FExpressionException {
+            return joinExpressions(operands, " || ");
+        }
+
+        private StringBuilder joinExpressions(List<FExpression> operands, String operator) throws FExpressionException {
+            if (operands.isEmpty()) {
+                return new StringBuilder();
+            }
+
+            StringBuilder fexpStr = new StringBuilder("(");
+            Iterator<FExpression> it = operands.iterator();
+            fexpStr.append(it.next().accept(this));
+
+            while (it.hasNext()) {
+                fexpStr.append(operator).append(it.next().accept(this));
+            }
+
+            return fexpStr.append(")");
+        }
+    }
+
 
     //Visitor Pattern
     public <E> E accept(FExpressionVisitorWithReturn<E> visitor) throws FExpressionException {
