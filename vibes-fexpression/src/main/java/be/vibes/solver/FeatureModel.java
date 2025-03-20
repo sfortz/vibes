@@ -17,11 +17,12 @@ import static de.vill.util.Util.addNecessaryQuotes;
  * This class represents a feature model and all its sub featuremodels if the
  * model is composed.
  */
-public class FeatureModel<T extends Feature> {
+public class FeatureModel<F extends Feature<F>> {
+//public class FeatureModel<F extends Feature<F>> {
 
     private String namespace;
-    private T rootFeature;
-    private final Map<String, T> featureMap = new HashMap<>();
+    private F rootFeature;
+    private final Map<String, F> featureMap = new HashMap<>();
     private final List<Constraint> ownConstraints = new LinkedList<>();
     private SolverFacade solver;
 
@@ -32,13 +33,68 @@ public class FeatureModel<T extends Feature> {
      * {@link de.vill.main.UVLModelFactory} class how the feature model is assembled
      * there.
      */
-    public FeatureModel() {
+    protected FeatureModel() {
     }
 
-    public FeatureModel(SolverFacade solver) {
+    protected FeatureModel(SolverFacade solver) {
         super();
         this.solver = solver;
     }
+
+    protected <G extends Feature<G>> FeatureModel(FeatureModel<G> otherFM) {
+
+        this(otherFM.getSolver());
+
+        F root;
+
+        // Ensure G extends F
+        try{
+            root = (F) otherFM.getRootFeature();
+        } catch (ClassCastException e){
+            throw new FeatureModelDefinitionException(e.getMessage(), e);
+        }
+
+        this.setNamespace(otherFM.getNamespace());
+        this.setRootFeature(root);
+
+        Queue<F> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            F f = queue.poll();
+            this.getFeatureMap().put(f.getFeatureName(), f);  // Safe cast
+
+            for (Group<F> group : f.getChildren()) {
+                queue.addAll(group.getFeatures());
+            }
+        }
+
+        this.getOwnConstraints().addAll(otherFM.getOwnConstraints());
+    }
+
+/*
+    protected <G extends Feature<G>> FeatureModel(FeatureModel<G> otherFM){
+    //protected <G extends F> FeatureModel(FeatureModel<G> otherFM) {
+        this(otherFM.getSolver());
+        this.setNamespace(otherFM.getNamespace());
+
+        F root = (F) otherFM.getRootFeature();
+        this.setRootFeature(root);
+
+        Queue<F> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            F f = queue.poll();
+            this.getFeatureMap().put(f.getFeatureName(), f);  // Safe cast
+
+            for (Group<F> group : f.getChildren()) {
+                queue.addAll(group.getFeatures());
+            }
+        }
+
+        this.getOwnConstraints().addAll(otherFM.getOwnConstraints());
+    }*/
 
     public void setSolver(SolverFacade solver) {
         if(this.solver == null){
@@ -52,13 +108,13 @@ public class FeatureModel<T extends Feature> {
         return solver;
     }
 
-    public T getFeature(String name) {
+    public F getFeature(String name) {
         if (name == null) {
             return null;
         }
 
         // Find matching feature in a case-insensitive way
-        for (Map.Entry<String, T> entry : this.featureMap.entrySet()) {
+        for (Map.Entry<String, F> entry : this.featureMap.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(name)) {
                 return entry.getValue();
             }
@@ -67,7 +123,7 @@ public class FeatureModel<T extends Feature> {
         return null; // Return null if no match is found
     }
 
-    public Collection<T> getFeatures() {
+    public Collection<F> getFeatures() {
         return this.featureMap.values();
     }
 
@@ -100,7 +156,7 @@ public class FeatureModel<T extends Feature> {
      *
      * @return root feature
      */
-    public T getRootFeature() {
+    public F getRootFeature() {
         return rootFeature;
     }
 
@@ -109,7 +165,7 @@ public class FeatureModel<T extends Feature> {
      *
      * @param rootFeature the root feature
      */
-    public void setRootFeature(T rootFeature) {
+    public void setRootFeature(F rootFeature) {
         this.rootFeature = rootFeature;
         // TODO: Change the solver by getting the root feature Feature Diagram.
     }
@@ -128,7 +184,7 @@ public class FeatureModel<T extends Feature> {
      *
      * @return A map with all features of the feature model
      */
-    public Map<String, T> getFeatureMap() {
+    public Map<String, F> getFeatureMap() {
         return featureMap;
     }
 
@@ -154,7 +210,7 @@ public class FeatureModel<T extends Feature> {
         return getFeatureConstraints(getRootFeature());
     }
 
-    private List<Constraint> getFeatureConstraints(T feature) {
+    private List<Constraint> getFeatureConstraints(F feature) {
         List<Constraint> featureConstraints = new LinkedList<>();
         Attribute<Constraint> featureConstraint = feature.getAttributes().get("constraint");
         Attribute<List<Constraint>> featureConstraintList = feature.getAttributes().get("constraints");
@@ -164,10 +220,10 @@ public class FeatureModel<T extends Feature> {
         if (featureConstraintList != null) {
             featureConstraints.addAll(featureConstraintList.getValue());
         }
-        for (Group<T> childGroup : feature.getChildren()) {
-            for (Feature childFeature : childGroup.getFeatures()) {
+        for (Group<F> childGroup : feature.getChildren()) {
+            for (F childFeature : childGroup.getFeatures()) {
                 if (!childFeature.isSubmodelRoot()) {
-                    featureConstraints.addAll(getFeatureConstraints((T) childFeature));
+                    featureConstraints.addAll(getFeatureConstraints(childFeature));
                 }
             }
         }
@@ -329,21 +385,21 @@ public class FeatureModel<T extends Feature> {
         return this.solver.getNumberOfSolutions();
     }
 
-    private List<T> getAncestors(T feature) {
-        List<T> ancestors = new ArrayList<>();
+    private List<F> getAncestors(F feature) {
+        List<F> ancestors = new ArrayList<>();
         while (feature != null) {
             ancestors.add(feature);
-            feature = (T) feature.getParentFeature();
+            feature = (F) feature.getParentFeature();
         }
         return ancestors;
     }
 
-    private T leastCommonAncestor(T f1, T f2) {
-        List<T> ancestorsF1 = getAncestors(f1);
-        List<T> ancestorsF2 = getAncestors(f2);
+    private F leastCommonAncestor(F f1, F f2) {
+        List<F> ancestorsF1 = getAncestors(f1);
+        List<F> ancestorsF2 = getAncestors(f2);
 
         // Find the lowest common ancestor
-        for (T ancestor : ancestorsF1) {
+        for (F ancestor : ancestorsF1) {
             if (ancestorsF2.contains(ancestor)) {
                 return ancestor;
             }
@@ -352,7 +408,7 @@ public class FeatureModel<T extends Feature> {
         return null;
     }
 
-    public T getLeastCommonAncestor (List<FExpression> fExpressions){
+    public F getLeastCommonAncestor (List<FExpression> fExpressions){
 
         FExpression disjunction = FExpression.falseValue();
 
@@ -366,10 +422,10 @@ public class FeatureModel<T extends Feature> {
             return this.getRootFeature();
         }
 
-        Set<T> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
+        Set<F> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
 
-        Iterator<T> iterator = features.iterator();
-        T lca = iterator.next();
+        Iterator<F> iterator = features.iterator();
+        F lca = iterator.next();
 
         while (iterator.hasNext()) {
             lca = leastCommonAncestor(lca, iterator.next());
