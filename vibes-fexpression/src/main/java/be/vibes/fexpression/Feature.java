@@ -8,6 +8,8 @@ import de.vill.model.FeatureType;
 import de.vill.model.Import;
 import de.vill.util.Util;
 import be.vibes.solver.Group;
+
+import java.io.Serial;
 import java.util.*;
 
 import static de.vill.util.Util.addNecessaryQuotes;
@@ -15,19 +17,19 @@ import static de.vill.util.Util.addNecessaryQuotes;
 /**
  * This class represents a feature of any kind (normal, numeric, abstract, ...).
  */
-public class Feature {
+public class Feature<F extends Feature<F>>{
 
     private final String featureName;
     private String nameSpace = "";
     private Import relatedImport;
     private String lowerBound;
     private String upperBound;
-    private final List<Group> children;
+    private final List<Group<F>> children;
     private final Map<String, Attribute> attributes;
     private FeatureType featureType;
     private boolean isSubmodelRoot = false;
 
-    private Group parent;
+    private Group<F> parent;
     private final List<ExclusionConstraint> exclusions = new LinkedList<>();
     private final List<RequirementConstraint> requirements = new LinkedList<>();
 
@@ -40,37 +42,39 @@ public class Feature {
      * @param name The name of the feature (without namespace information)
      */
     public Feature(String name) {
-        if (name.charAt(0) == '\'') {
+        if (name != null && name.length() > 1 && name.charAt(0) == '\'') {
             this.featureName = name.substring(1, name.length() - 1);
         } else {
             this.featureName = name;
         }
-        children = new LinkedList<Group>() {
+
+        children = new LinkedList<>() {
 
             /**
              * This custom class with the List-Interface is used to force the update of the
              * parent reference of children.
-             */
+             **/
+            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
-            public boolean add(Group e) {
+            public boolean add(Group<F> e) {
                 if (super.add(e)) {
-                    e.setParentFeature(Feature.this);
+                    e.setParentFeature((F) Feature.this);
                     return true;
                 }
                 return false;
             }
 
             @Override
-            public void add(int index, Group element) {
+            public void add(int index, Group<F> element) {
                 super.set(index, element);
-                element.setParentFeature(Feature.this);
+                element.setParentFeature((F) Feature.this);
             }
 
             @Override
-            public Group remove(int index) {
-                Group g = super.remove(index);
+            public Group<F> remove(int index) {
+                Group<F> g = super.remove(index);
                 g.setParentFeature(null);
                 return g;
             }
@@ -78,16 +82,16 @@ public class Feature {
             @Override
             public boolean remove(Object o) {
                 if (super.remove(o)) {
-                    ((Group) o).setParentFeature(null);
+                    ((Group<F>) o).setParentFeature(null);
                     return true;
                 }
                 return false;
             }
 
             @Override
-            public boolean addAll(int index, Collection<? extends Group> c) {
+            public boolean addAll(int index, Collection<? extends Group<F>> c) {
                 if (super.addAll(index, c)) {
-                    c.forEach(e -> e.setParentFeature(Feature.this));
+                    c.forEach(e -> e.setParentFeature((F) Feature.this));
                     return true;
                 }
                 return false;
@@ -95,28 +99,27 @@ public class Feature {
 
             @Override
             public void clear() {
-                ListIterator<Group> it = this.listIterator();
-                while (it.hasNext()) {
-                    it.next().setParentFeature(null);
+                for (Group<F> featureGroup : this) {
+                    featureGroup.setParentFeature(null);
                 }
                 super.clear();
             }
 
             @Override
-            public Group set(int index, Group element) {
-                Group g;
+            public Group<F> set(int index, Group<F> element) {
+                Group<F> g;
                 if ((g = super.set(index, element)) != null) {
-                    g.setParentFeature(Feature.this);
+                    g.setParentFeature((F) Feature.this);
                     return g;
                 }
                 return null;
             }
 
-            class GroupIterator implements ListIterator<Group> {
-                private ListIterator<Group> itr;
-                Group lastReturned;
+            class GroupIterator implements ListIterator<Group<F>> {
+                private final ListIterator<Group<F>> itr;
+                Group<F> lastReturned;
 
-                public GroupIterator(ListIterator<Group> itr) {
+                public GroupIterator(ListIterator<Group<F>> itr) {
                     this.itr = itr;
                 }
 
@@ -126,7 +129,7 @@ public class Feature {
                 }
 
                 @Override
-                public Group next() {
+                public Group<F> next() {
                     lastReturned = itr.next();
                     return lastReturned;
                 }
@@ -137,7 +140,7 @@ public class Feature {
                 }
 
                 @Override
-                public Group previous() {
+                public Group<F> previous() {
                     lastReturned = itr.previous();
                     return lastReturned;
                 }
@@ -159,22 +162,22 @@ public class Feature {
                 }
 
                 @Override
-                public void set(Group e) {
+                public void set(Group<F> e) {
                     itr.set(e);
                     lastReturned.setParentFeature(null);
-                    e.setParentFeature(Feature.this);
+                    e.setParentFeature((F) Feature.this);
                 }
 
                 @Override
-                public void add(Group e) {
+                public void add(Group<F> e) {
                     itr.add(e);
-                    e.setParentFeature(Feature.this);
+                    e.setParentFeature((F) Feature.this);
                 }
 
             }
 
             @Override
-            public ListIterator<Group> listIterator(int index) {
+            public ListIterator<Group<F>> listIterator(int index) {
                 return new GroupIterator(super.listIterator(index));
             }
 
@@ -184,8 +187,8 @@ public class Feature {
         attributes = new HashMap<>();
     }
 
-    public static Feature feature(String name) {
-        return new Feature(name);
+    public static Feature<?> feature(String name) {
+        return new Feature<>(name);
     }
 
     /**
@@ -208,7 +211,7 @@ public class Feature {
      *
      * @return A list of all children of the feature.
      */
-    public List<Group> getChildren() {
+    public List<Group<F>> getChildren() {
         return children;
     }
 
@@ -221,7 +224,7 @@ public class Feature {
      *              would break the tree structure which is necessary. This is not
      *              checked by this method.
      */
-    public void addChildren(Group group) {
+    public void addChildren(Group<F> group) {
         children.add(group);
     }
 
@@ -300,7 +303,6 @@ public class Feature {
     /**
      * Adds the feature type of the feature (if supported by the language level)
      *
-     * @param featureType
      */
     public void setFeatureType(final FeatureType featureType) {
         this.featureType = featureType;
@@ -432,7 +434,7 @@ public class Feature {
         result.append(attributesToString(false, currentAlias));
         result.append(Configuration.getNewlineSymbol());
 
-        for (Group group : children) {
+        for (Group<F> group : children) {
             result.append(Util.indentEachLine(group.toString(false, currentAlias)));
         }
 
@@ -472,7 +474,7 @@ public class Feature {
             result.append(attributesToString(withSubmodels, currentAlias));
             result.append(Configuration.getNewlineSymbol());
 
-            for (Group group : children) {
+            for (Group<F> group : children) {
                 result.append(Util.indentEachLine(group.toString(withSubmodels, currentAlias)));
             }
         }
@@ -509,7 +511,7 @@ public class Feature {
      *
      * @return Parent group of the feature. Null if it is the root feature.
      */
-    public Group getParentGroup() {
+    public Group<F> getParentGroup() {
         return parent;
     }
 
@@ -518,7 +520,7 @@ public class Feature {
      *
      * @param parent the parent of the group
      */
-    public void setParentGroup(Group parent) {
+    public void setParentGroup(Group<F> parent) {
         this.parent = parent;
     }
 
@@ -527,7 +529,7 @@ public class Feature {
      *
      * @return parent feature of the feature. Null if it is the root feature.
      */
-    public Feature getParentFeature() {
+    public Feature<?> getParentFeature() {
         if (parent != null) {
             return parent.getParentFeature();
         }
@@ -590,8 +592,8 @@ public class Feature {
     }
 
     @Override
-    public Feature clone() {
-        Feature feature = new Feature(getFeatureName());
+    public Feature<F> clone() {
+        Feature<F> feature = new Feature<>(getFeatureName());
         feature.setNameSpace(getNameSpace());
         feature.setLowerBound(getLowerBound());
         feature.setUpperBound(getUpperBound());
@@ -599,11 +601,11 @@ public class Feature {
         feature.setRelatedImport(getRelatedImport());
         feature.setFeatureType(this.getFeatureType());
         feature.getAttributes().putAll(getAttributes());
-        for (Group group : getChildren()) {
+        for (Group<F> group : getChildren()) {
             feature.getChildren().add(group.clone());
         }
-        for (Group group : feature.getChildren()) {
-            group.setParentFeature(feature);
+        for (Group<F> group : feature.getChildren()) {
+            group.setParentFeature((F) feature);
         }
         return feature;
     }
@@ -614,43 +616,43 @@ public class Feature {
             return false;
         }
 
-        if (!(this.getFeatureName().equals(((Feature) obj).getFeatureName()))) {
+        if (!(this.getFeatureName().equals(((Feature<F>) obj).getFeatureName()))) {
             return false;
         }
 
-        if (this.getFeatureType() != null && !(this.getFeatureType().equals(((Feature) obj).getFeatureType()))) {
+        if (this.getFeatureType() != null && !(this.getFeatureType().equals(((Feature<?>) obj).getFeatureType()))) {
             return false;
         }
 
-        if (this.getUpperBound() != null && !(this.getUpperBound().equals(((Feature) obj).getUpperBound()))) {
+        if (this.getUpperBound() != null && !(this.getUpperBound().equals(((Feature<F>) obj).getUpperBound()))) {
             return false;
         }
 
-        if (this.getLowerBound() != null && !(this.getLowerBound().equals(((Feature) obj).getLowerBound()))) {
+        if (this.getLowerBound() != null && !(this.getLowerBound().equals(((Feature<F>) obj).getLowerBound()))) {
             return false;
         }
 
         // check attributes
-        if (this.getAttributes().size() != ((Feature) obj).getAttributes().size()) {
+        if (this.getAttributes().size() != ((Feature<F>) obj).getAttributes().size()) {
             return false;
         }
-        Map<String, Attribute> objAttributes = ((Feature) obj).getAttributes();
+        Map<String, Attribute> objAttributes = ((Feature<F>) obj).getAttributes();
         for (String key: this.getAttributes().keySet()) {
             if (!objAttributes.containsKey(key)) {
                 return false;
             }
 
-            if (!this.getAttributes().get(key).equals(((Feature) obj).getAttributes().get(key))) {
+            if (!this.getAttributes().get(key).equals(((Feature<F>) obj).getAttributes().get(key))) {
                 return false;
             }
         }
 
-        if (this.getChildren().size() != ((Feature) obj).getChildren().size()) {
+        if (this.getChildren().size() != ((Feature<F>) obj).getChildren().size()) {
             return false;
         }
 
-        final List<Group> objGroups = ((Feature) obj).getChildren();
-        for (final Group currentGroup : this.getChildren()) {
+        final List<Group<F>> objGroups = ((Feature<F>) obj).getChildren();
+        for (final Group<F> currentGroup : this.getChildren()) {
             if (!objGroups.contains(currentGroup)) {
                 return false;
             }

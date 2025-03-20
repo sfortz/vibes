@@ -10,11 +10,11 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.List;
 
 public interface FeatureModelElementPrinter {
-    void printElement(XMLStreamWriter writer, FeatureModel fm) throws XMLStreamException;
+    void printElement(XMLStreamWriter writer, FeatureModel<?> fm) throws XMLStreamException;
 
-    void printElement(XMLStreamWriter xtw, Feature feature) throws XMLStreamException;
+    void printElement(XMLStreamWriter xtw, Feature<?> feature) throws XMLStreamException;
 
-    void printElement(XMLStreamWriter xtw, Group group) throws XMLStreamException;
+    void printElement(XMLStreamWriter xtw, Group<?> group) throws XMLStreamException;
 
     void printExclusions(XMLStreamWriter xtw, List<ExclusionConstraint> exclusions) throws XMLStreamException;
 

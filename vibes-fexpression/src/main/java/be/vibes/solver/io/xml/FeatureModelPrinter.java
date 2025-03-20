@@ -18,10 +18,10 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureModelPrinter.class);
 
-    private FeatureModel fm;
+    private FeatureModel<?>  fm;
 
     @Override
-    public void printElement(XMLStreamWriter xtw, FeatureModel fm) throws XMLStreamException {
+    public void printElement(XMLStreamWriter xtw, FeatureModel<?> fm) throws XMLStreamException {
 
         this.fm = fm;
         LOG.trace("Printing FM element");
@@ -33,11 +33,11 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
     }
 
     @Override
-    public void printElement(XMLStreamWriter xtw, Feature feature) throws XMLStreamException {
+    public void printElement(XMLStreamWriter xtw, Feature<?> feature) throws XMLStreamException {
         LOG.trace("Printing feature element");
         xtw.writeStartElement(FEATURE_TAG);
         xtw.writeAttribute(NAME_ATTR, feature.getFeatureName());
-        for(Group group: feature.getChildren()){
+        for(Group<?>  group: feature.getChildren()){
             printElement(xtw, group);
         }
 
@@ -55,7 +55,7 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
     }
 
     @Override
-    public void printElement(XMLStreamWriter xtw, Group group) throws XMLStreamException {
+    public void printElement(XMLStreamWriter xtw, Group<?>  group) throws XMLStreamException {
         LOG.trace("Printing group element");
         switch (group.GROUPTYPE){
             case OR -> xtw.writeStartElement(OR_TAG);
@@ -64,8 +64,8 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
             case OPTIONAL -> xtw.writeStartElement(OPTIONAL_TAG);
         }
 
-        for (Feature feature : (List<Feature>) group.getFeatures()) {
-            Feature f = fm.getFeature(feature.getFeatureName());
+        for (Feature<?> feature : group.getFeatures()) {
+            Feature<?> f = fm.getFeature(feature.getFeatureName());
             printElement(xtw, f);
         }
 

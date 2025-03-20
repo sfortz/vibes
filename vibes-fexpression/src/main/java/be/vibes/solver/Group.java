@@ -4,6 +4,7 @@ import be.vibes.fexpression.Feature;
 import de.vill.config.Configuration;
 import de.vill.util.Util;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.ListIterator;
  * This class represents all kinds of groups (or, alternative, mandatory,
  * optional, cardinality)
  */
-public class Group<F extends Feature> {
+public class Group<F extends Feature<F>> {
     /**
      * An enum with all possible group types.
      */
@@ -36,10 +37,11 @@ public class Group<F extends Feature> {
      */
     public Group(GroupType groupType) {
         this.GROUPTYPE = groupType;
-        features = new LinkedList<F>() {
+        features = new LinkedList<>() {
             /**
              *
              */
+            @Serial
             private static final long serialVersionUID = 3856024708694486586L;
 
             @Override
@@ -84,9 +86,8 @@ public class Group<F extends Feature> {
 
             @Override
             public void clear() {
-                ListIterator<F> it = this.listIterator();
-                while (it.hasNext()) {
-                    it.next().setParentGroup(null);
+                for (F f : this) {
+                    f.setParentGroup(null);
                 }
                 super.clear();
             }
@@ -102,7 +103,7 @@ public class Group<F extends Feature> {
             }
 
             class FeatureIterator implements ListIterator<F> {
-                private ListIterator<F> itr;
+                private final ListIterator<F> itr;
                 F lastReturned;
 
                 public FeatureIterator(ListIterator<F> itr) {

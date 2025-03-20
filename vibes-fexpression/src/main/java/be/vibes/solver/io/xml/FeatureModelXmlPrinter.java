@@ -26,7 +26,7 @@ public class FeatureModelXmlPrinter {
         this.output = output;
     }
 
-    public void print(FeatureModel fm) throws XMLStreamException {
+    public void print(FeatureModel<?> fm) throws XMLStreamException {
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         IndentingXMLStreamWriter xtw = new IndentingXMLStreamWriter(xof.createXMLStreamWriter(this.output));
         xtw.setIndentStep("    ");
