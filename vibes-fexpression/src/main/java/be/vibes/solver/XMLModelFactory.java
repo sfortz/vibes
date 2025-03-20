@@ -11,38 +11,41 @@ import be.vibes.solver.exception.SolverInitializationException;
 import de.vill.exception.ParseError;
 import de.vill.model.constraint.Constraint;
 import de.vill.model.constraint.LiteralConstraint;
-
 import java.util.*;
+import java.util.function.Supplier;
 
-public abstract class XMLModelFactory<F extends Feature, T extends FeatureModel<F>> {
+public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureModel<F>> {
 
     private final SolverType solverType;
     private final T featureModel;
 
-    public XMLModelFactory(T featureModel) {
-        this(featureModel, featureModel.getSolver());
+    protected XMLModelFactory(Supplier<T> featureModelSupplier) {
+        this(featureModelSupplier, SolverType.BDD);
     }
 
-    private XMLModelFactory(T featureModel, SolverFacade solver) {
-        if(solver == null){
-            this.solverType = SolverType.BDD;
-        }else {
-            this.solverType = solver.getType();
+    protected XMLModelFactory(Supplier<T> featureModelSupplier, SolverType type) {
+        this.solverType = type;
+        this.featureModel = featureModelSupplier.get();
+    }
+
+    /*
+    public <G extends F> XMLModelFactory(Class<T> newFmType, FeatureModel<G> otherFM) {
+        //G extends Feature ?
+
+        Class[] cArg = new Class[1];
+        cArg[0] = otherFM.getClass();
+
+        // protected <G extends F> FeatureModel(FeatureModel<G> otherFM)
+
+        T fm = null;
+        try {
+            fm = newFmType.getDeclaredConstructor(cArg).newInstance(otherFM);
+            this.featureModel = fm;
+            this.solverType = fm.getSolver().getType();
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            throw new FeatureModelDefinitionException(e.getMessage(), e);
         }
-        this.featureModel = featureModel;
-    }
-
-
-    public XMLModelFactory(T featureModel, SolverType type) {
-
-        switch (type) {
-            case SAT4J -> this.solverType = SolverType.SAT4J;
-            case BDD -> this.solverType = SolverType.BDD;
-            default -> throw new UnsupportedOperationException("Only SAT4J and BDD solvers are currently supported.");
-        }
-
-        this.featureModel = featureModel;
-    }
+    }*/
 
     public void setNamespace(String namespace) {
         featureModel.setNamespace(namespace);
