@@ -71,7 +71,7 @@ public class UVLModelFactory {
         });
 
 
-        UVLListener uvlListener = new UVLListener(this.solverType);
+        UVLListener<?> uvlListener = new UVLListener<>(this.solverType);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(uvlListener, UVLJavaParser.featureModel());
         FeatureModel<?> featureModel = null;

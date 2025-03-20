@@ -18,7 +18,6 @@ import static de.vill.util.Util.addNecessaryQuotes;
  * model is composed.
  */
 public class FeatureModel<F extends Feature<F>> {
-//public class FeatureModel<F extends Feature<F>> {
 
     private String namespace;
     private F rootFeature;
@@ -71,30 +70,6 @@ public class FeatureModel<F extends Feature<F>> {
 
         this.getOwnConstraints().addAll(otherFM.getOwnConstraints());
     }
-
-/*
-    protected <G extends Feature<G>> FeatureModel(FeatureModel<G> otherFM){
-    //protected <G extends F> FeatureModel(FeatureModel<G> otherFM) {
-        this(otherFM.getSolver());
-        this.setNamespace(otherFM.getNamespace());
-
-        F root = (F) otherFM.getRootFeature();
-        this.setRootFeature(root);
-
-        Queue<F> queue = new LinkedList<>();
-        queue.add(root);
-
-        while (!queue.isEmpty()) {
-            F f = queue.poll();
-            this.getFeatureMap().put(f.getFeatureName(), f);  // Safe cast
-
-            for (Group<F> group : f.getChildren()) {
-                queue.addAll(group.getFeatures());
-            }
-        }
-
-        this.getOwnConstraints().addAll(otherFM.getOwnConstraints());
-    }*/
 
     public void setSolver(SolverFacade solver) {
         if(this.solver == null){

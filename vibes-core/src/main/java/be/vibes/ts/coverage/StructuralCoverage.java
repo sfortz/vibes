@@ -47,7 +47,7 @@ public abstract class StructuralCoverage<T> implements CoverageCriteria {
      * @param fts The featured transition system for which the coverage criteria will be reported.
      * @param fm  The feature model used during the execution of the tests to compute the coverage criteria.
      */
-    public StructuralCoverage(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public StructuralCoverage(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         this.ts = fts;
         this.executor = new FeaturedTransitionSystemExecutor(fts, fm);
         this.elementsToCover = Sets.newHashSet(getElementsToBeCovered());

@@ -47,7 +47,7 @@ public class FeaturedTransitionSystemExecutor extends TransitionSystemExecutor {
 
     private final SolverFacade fm;
 
-    public FeaturedTransitionSystemExecutor(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public FeaturedTransitionSystemExecutor(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         super(fts);
         this.fm = fm.getSolver();
     }

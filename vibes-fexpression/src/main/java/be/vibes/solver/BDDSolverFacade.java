@@ -23,14 +23,10 @@ package be.vibes.solver;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import be.vibes.solver.exception.SolverFatalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDD.AllSatIterator;
 import net.sf.javabdd.BDDFactory;

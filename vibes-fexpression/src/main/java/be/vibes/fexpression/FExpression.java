@@ -38,7 +38,7 @@ import java.util.Set;
  */
 public class FExpression {
 
-    private Expression<Feature> expression;
+    private Expression<Feature<?>> expression;
 
     public static FExpression trueValue() {
         return new FExpression(Literal.of(true));
@@ -52,28 +52,28 @@ public class FExpression {
         return new FExpression(name);
     }
 
-    public static FExpression featureExpr(Feature feat) {
+    public static FExpression featureExpr(Feature<?> feat) {
         return new FExpression(feat);
     }
 
-    private FExpression(Expression<Feature> expression) {
+    private FExpression(Expression<Feature<?>> expression) {
         this.expression = expression;
     }
 
-    public FExpression(Feature feat) {
+    public FExpression(Feature<?> feat) {
         expression = Variable.of(feat);
     }
 
     public FExpression(String featureName) {
-        this(new Feature(featureName));
+        this(new Feature<>(featureName));
     }
 
     // Accessors 
-    Expression<Feature> getExpression() {
+    Expression<Feature<?>> getExpression() {
         return expression;
     }
 
-    public Set<Feature> getFeatures() {
+    public Set<Feature<?>> getFeatures() {
         return ExprUtil.getVariables(expression);
     }
 
@@ -87,7 +87,7 @@ public class FExpression {
 
     // FExpression built methods
     public FExpression applySimplification() {
-        Expression<Feature> expr = RuleSet.simplify(expression);
+        Expression<Feature<?>> expr = RuleSet.simplify(expression);
         return new FExpression(expr);
     }
 
@@ -131,43 +131,43 @@ public class FExpression {
     // Assignements 
     
     public FExpression assign(Configuration config) {
-        Map<Feature, Boolean> assignements = Maps.newHashMap();
-        for(Feature f : getFeatures()){
+        Map<Feature<?>, Boolean> assignements = Maps.newHashMap();
+        for(Feature<?> f : getFeatures()){
             assignements.put(f, config.isSelected(f));
         }
         return assign(assignements);
     }
 
-    public FExpression assignTrue(Feature f) {
-        Map<Feature, Boolean> assignements = Maps.newHashMap();
+    public FExpression assignTrue(Feature<?> f) {
+        Map<Feature<?>, Boolean> assignements = Maps.newHashMap();
         assignements.put(f, Boolean.TRUE);
         return assign(assignements);
     }
     
-    public FExpression assignTrue(Iterable<Feature> trueFeatures) {
-        Map<Feature, Boolean> assignements = Maps.newHashMap();
-        for (Feature f : trueFeatures) {
+    public FExpression assignTrue(Iterable<Feature<?>> trueFeatures) {
+        Map<Feature<?>, Boolean> assignements = Maps.newHashMap();
+        for (Feature<?> f : trueFeatures) {
             assignements.put(f, Boolean.TRUE);
         }
         return assign(assignements);
     }
     
-    public FExpression assignFalse(Feature f) {
-        Map<Feature, Boolean> assignements = Maps.newHashMap();
+    public FExpression assignFalse(Feature<?> f) {
+        Map<Feature<?>, Boolean> assignements = Maps.newHashMap();
         assignements.put(f, Boolean.FALSE);
         return assign(assignements);
     }
 
-    public FExpression assignFalse(Iterable<Feature> falseFeatures) {
-        Map<Feature, Boolean> assignements = Maps.newHashMap();
-        for (Feature f : falseFeatures) {
+    public FExpression assignFalse(Iterable<Feature<?>> falseFeatures) {
+        Map<Feature<?>, Boolean> assignements = Maps.newHashMap();
+        for (Feature<?> f : falseFeatures) {
             assignements.put(f, Boolean.FALSE);
         }
         return assign(assignements);
     }
         
-    public FExpression assign(Map<Feature, Boolean> assignements) {
-        Expression<Feature> expr = RuleSet.assign(expression, assignements);
+    public FExpression assign(Map<Feature<?>, Boolean> assignements) {
+        Expression<Feature<?>> expr = RuleSet.assign(expression, assignements);
         return new FExpression(expr);
     }
 
@@ -197,28 +197,28 @@ public class FExpression {
 
     //Visitor Pattern
     public <E> E accept(FExpressionVisitorWithReturn<E> visitor) throws FExpressionException {
-        Expression<Feature> exp = getExpression();
+        Expression<Feature<?>> exp = getExpression();
 
         switch (exp) {
-            case Literal literal -> {
+            case Literal<?> literal -> {
                 return visitor.constant(isTrue());
             }
-            case Variable<Feature> variable -> {
+            case Variable<Feature<?>> variable -> {
                 return visitor.feature(variable.getValue());
             }
-            case Not not -> {
+            case Not<Feature<?>> not -> {
                 return visitor.not(new FExpression(not.getE()));
             }
-            case And and -> {
+            case And<?> and -> {
                 List<FExpression> operands = Lists.newArrayList();
-                for (Expression<Feature> e : exp.getChildren()) {
+                for (Expression<Feature<?>> e : exp.getChildren()) {
                     operands.add(new FExpression(e));
                 }
                 return visitor.and(operands);
             }
-            case Or or -> {
+            case Or<?> or -> {
                 List<FExpression> operands = Lists.newArrayList();
-                for (Expression<Feature> e : exp.getChildren()) {
+                for (Expression<Feature<?>> e : exp.getChildren()) {
                     operands.add(new FExpression(e));
                 }
                 return visitor.or(operands);

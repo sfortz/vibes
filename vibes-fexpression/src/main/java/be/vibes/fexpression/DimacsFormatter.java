@@ -73,7 +73,7 @@ public class DimacsFormatter implements FExpressionVisitorWithReturn<Object> {
     }
 
     @Override
-    public Object feature(Feature feature) {
+    public Object feature(Feature<?> feature) {
         lastCall = LastCallType.feature;
         return featureMapping.get(feature.getFeatureName());
     }

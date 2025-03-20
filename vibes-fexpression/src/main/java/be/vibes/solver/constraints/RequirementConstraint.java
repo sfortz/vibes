@@ -1,15 +1,8 @@
 package be.vibes.solver.constraints;
 
 import de.vill.model.constraint.Constraint;
-import de.vill.model.constraint.ExpressionConstraint;
 import de.vill.model.constraint.ImplicationConstraint;
 import de.vill.model.constraint.LiteralConstraint;
-import de.vill.model.expression.Expression;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 public class RequirementConstraint extends ImplicationConstraint {
     private LiteralConstraint left;

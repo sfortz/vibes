@@ -35,7 +35,7 @@ import java.util.Iterator;
  */
 public class SimpleConfiguration implements Configuration {
 
-    private final Set<Feature> features;
+    private final Set<Feature<?>> features;
 
     /**
      * Creates a new simple configuration.
@@ -49,26 +49,26 @@ public class SimpleConfiguration implements Configuration {
      *
      * @param features The initial set of selected features.
      */
-    public SimpleConfiguration(Iterable<Feature> features) {
+    public SimpleConfiguration(Iterable<Feature<?>> features) {
         this.features = Sets.newHashSet(features);
     }
 
-    public SimpleConfiguration(Feature... features) {
+    public SimpleConfiguration(Feature<?>... features) {
         this.features = Sets.newHashSet(features);
     }
 
     @Override
-    public void selectFeature(Feature feature) {
+    public void selectFeature(Feature<?> feature) {
         features.add(feature);
     }
 
     @Override
-    public void deselectFeature(Feature feature) {
+    public void deselectFeature(Feature<?> feature) {
         features.remove(feature);
     }
 
     @Override
-    public boolean isSelected(Feature feature) {
+    public boolean isSelected(Feature<?> feature) {
         return features.contains(feature);
     }
 
@@ -78,12 +78,12 @@ public class SimpleConfiguration implements Configuration {
     }
 
     @Override
-    public Feature[] getFeatures() {
-        return features.toArray(new Feature[0]);
+    public Feature<?>[] getFeatures() {
+        return features.toArray(new Feature<?>[0]);
     }
 
     @Override
-    public Iterator<Feature> iterator() {
+    public Iterator<Feature<?>> iterator() {
         return this.features.iterator();
     }
 

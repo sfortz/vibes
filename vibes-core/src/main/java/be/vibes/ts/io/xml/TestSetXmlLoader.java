@@ -50,7 +50,7 @@ public class TestSetXmlLoader {
         return handler.getTestSet();
     }
 
-    public static TestSet loadTestSet(InputStream in, FeaturedTransitionSystem fts, FeatureModel fm) throws TransitionSystemDefinitionException {
+    public static TestSet loadTestSet(InputStream in, FeaturedTransitionSystem fts, FeatureModel<?> fm) throws TransitionSystemDefinitionException {
         FtsTestCaseHandler handler = new FtsTestCaseHandler(fts, fm);
         try {
             XmlReader reader = new XmlReader(handler, in);

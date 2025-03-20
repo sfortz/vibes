@@ -222,7 +222,7 @@ public class Xml {
      * @return The set of test cases contained in the given input.
      * @throws TestCaseDefinitionException if the test set could not be loaded.
      */
-    public static TestSet loadTestSet(InputStream in, FeaturedTransitionSystem fts, FeatureModel fm) {
+    public static TestSet loadTestSet(InputStream in, FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         try {
             return TestSetXmlLoader.loadTestSet(in, fts, fm);
         } catch (TransitionSystemDefinitionException e) {

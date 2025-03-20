@@ -97,7 +97,7 @@ public class Execute {
      * @return The execution tree, representing the different sequences of
      * transitions fired when executing the test case on the transition system.
      */
-    public static List<Execution> execute(FeaturedTransitionSystem fts, FeatureModel fm, List<Action> actions) {
+    public static List<Execution> execute(FeaturedTransitionSystem fts, FeatureModel<?> fm, List<Action> actions) {
         TransitionSystemExecutor exec = new FeaturedTransitionSystemExecutor(fts, fm);
         actions.forEach((action) -> {
             try {
@@ -121,7 +121,7 @@ public class Execute {
      * @return The execution tree, representing the different sequences of
      * transitions fired when executing the test case on the transition system.
      */
-    public static List<Execution> execute(FeaturedTransitionSystem fts, FeatureModel fm, TestCase testCase) {
+    public static List<Execution> execute(FeaturedTransitionSystem fts, FeatureModel<?> fm, TestCase testCase) {
         List<Action> actions = new ArrayList<>();
         testCase.iterator().forEachRemaining((transition) -> {
             actions.add(transition.getAction());

@@ -37,9 +37,9 @@ public class FtsTestCaseHandler extends TestCaseHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(FtsTestCaseHandler.class);
 
-    private final FeatureModel fm;
+    private final FeatureModel<?> fm;
 
-    public FtsTestCaseHandler(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public FtsTestCaseHandler(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         super(fts);
         this.fm = fm;
     }

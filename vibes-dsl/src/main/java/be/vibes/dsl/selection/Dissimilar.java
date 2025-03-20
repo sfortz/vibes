@@ -175,7 +175,7 @@ public class Dissimilar {
      * @see HammingDissimilarityComputor
      */
     public static TestCaseDissimilarityComputor hamming(TransitionSystem ts) {
-        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new HammingDissimilarityComputor(Sets.newHashSet(ts.actions())));
+        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new HammingDissimilarityComputor<>(Sets.newHashSet(ts.actions())));
     }
 
     /**
@@ -185,7 +185,7 @@ public class Dissimilar {
      * @see JaccardDissimilarityComputor
      */
     public static TestCaseDissimilarityComputor jaccard() {
-        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new JaccardDissimilarityComputor());
+        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new JaccardDissimilarityComputor<>());
     }
 
     /**
@@ -195,7 +195,7 @@ public class Dissimilar {
      * @see DiceDissimilarityComputor
      */
     public static TestCaseDissimilarityComputor dice() {
-        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new DiceDissimilarityComputor());
+        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new DiceDissimilarityComputor<>());
     }
 
     /**
@@ -205,7 +205,7 @@ public class Dissimilar {
      * @see AntiDiceDissimilarityComputor
      */
     public static TestCaseDissimilarityComputor antidice() {
-        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new AntiDiceDissimilarityComputor());
+        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new AntiDiceDissimilarityComputor<>());
     }
 
     /**
@@ -215,7 +215,7 @@ public class Dissimilar {
      * @see LevenshteinDissimilarityComputor
      */
     public static TestCaseDissimilarityComputor levenshtein() {
-        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new LevenshteinDissimilarityComputor());
+        return TestCaseDissimilarityComputor.toTestCaseDissimilarityComputor(new LevenshteinDissimilarityComputor<>());
     }
 
     /**

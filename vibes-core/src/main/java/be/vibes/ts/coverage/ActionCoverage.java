@@ -33,7 +33,7 @@ public class ActionCoverage extends StructuralCoverage<Action> {
      * @param fts The featured transition system for which the coverage criteria will be reported.
      * @param fm  The feature model used during the execution of the tests to compute the coverage criteria.
      */
-    public ActionCoverage(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public ActionCoverage(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         super(fts, fm);
     }
 

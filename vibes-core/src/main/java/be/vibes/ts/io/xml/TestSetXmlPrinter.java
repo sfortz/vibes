@@ -37,7 +37,7 @@ public class TestSetXmlPrinter {
     
     protected OutputStream output;
     
-    private TestCaseElementPrinter printer;
+    private final TestCaseElementPrinter printer;
 
     public TestSetXmlPrinter(OutputStream output, TestCaseElementPrinter printer) {
         this.output = output;

@@ -41,14 +41,14 @@ public abstract class TestSetDefinition {
     private boolean defined = false;
     protected TestSet testSet = new TestSet();
     private final TransitionSystem ts;
-    private final FeatureModel fm;
+    private final FeatureModel<?> fm;
 
     protected TestSetDefinition(TransitionSystem ts) {
         this.ts = ts;
         this.fm = null;
     }
 
-    protected TestSetDefinition(FeaturedTransitionSystem fts, FeatureModel fm) {
+    protected TestSetDefinition(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         this.ts = fts;
         this.fm = fm;
     }

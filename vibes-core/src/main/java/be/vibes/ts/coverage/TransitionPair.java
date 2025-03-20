@@ -12,8 +12,8 @@ import java.util.Objects;
  */
 public class TransitionPair {
 
-    private Transition first;
-    private Transition second;
+    private final Transition first;
+    private final Transition second;
 
     public TransitionPair(Transition first, Transition second) {
         this.first = first;

@@ -30,7 +30,7 @@ import be.vibes.fexpression.exception.ConfigurationException;
  * @author Xavier Devroey - xavier.devroey@unamur.be
  *
  */
-public interface Configuration extends Iterable<Feature> {
+public interface Configuration extends Iterable<Feature<?>> {
 
     /**
      * Add the feature to the selected features. A feature is identified by its
@@ -40,14 +40,14 @@ public interface Configuration extends Iterable<Feature> {
      * @throws ConfigurationException If the feature can not be added to the
      * current configuration.
      */
-    void selectFeature(Feature feature) throws ConfigurationException;
+    void selectFeature(Feature<?> feature) throws ConfigurationException;
 
     /**
      * Deselect the given feature.
      *
      * @param feature The feature to deselect
      */
-    void deselectFeature(Feature feature);
+    void deselectFeature(Feature<?> feature);
 
     /**
      * Returns true if the given feature is selected.
@@ -55,13 +55,13 @@ public interface Configuration extends Iterable<Feature> {
      * @param feature The feature to test.
      * @return True if the given feature is selected.
      */
-    boolean isSelected(Feature feature);
+    boolean isSelected(Feature<?> feature);
 
     /**
      * Returns the list of feature in an array of Strings
      *
-     * @return the list of (selected) features in the configuration
+     * @return the array of (selected) features in the configuration
      */
-    public abstract Feature[] getFeatures();
+    public abstract Feature<?>[] getFeatures();
 
 }

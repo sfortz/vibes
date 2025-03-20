@@ -34,7 +34,7 @@ public class TransitionPairCoverage extends StructuralCoverage<TransitionPair> {
      * @param fts The featured transition system for which the coverage criteria will be reported.
      * @param fm  The feature model used during the execution of the tests to compute the coverage criteria.
      */
-    public TransitionPairCoverage(FeaturedTransitionSystem fts, FeatureModel fm) {
+    public TransitionPairCoverage(FeaturedTransitionSystem fts, FeatureModel<?> fm) {
         super(fts, fm);
     }
 

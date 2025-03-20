@@ -37,14 +37,14 @@ public class ConfigurationSet implements Set<Configuration> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSet.class);
 
-    private final FeatureModel solver;
+    private final FeatureModel<?> solver;
     private FExpression constraint;
 
-    public ConfigurationSet(FeatureModel solver) {
+    public ConfigurationSet(FeatureModel<?> solver) {
         this(solver, FExpression.trueValue());
     }
 
-    public ConfigurationSet(FeatureModel solver, FExpression constraint) {
+    public ConfigurationSet(FeatureModel<?> solver, FExpression constraint) {
         this.solver = solver;
         this.constraint = constraint;
     }

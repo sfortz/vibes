@@ -27,14 +27,14 @@ import javax.xml.stream.events.StartElement;
 
 public interface XmlEventHandler {
 
-    public void handleStartDocument();
+    void handleStartDocument();
 
-    public void handleEndDocument();
+    void handleEndDocument();
 
-    public void handleStartElement(StartElement asStartElement) throws XMLStreamException;
+    void handleStartElement(StartElement asStartElement) throws XMLStreamException;
 
-    public void handleEndElement(EndElement asEndElement) throws XMLStreamException;
+    void handleEndElement(EndElement asEndElement) throws XMLStreamException;
 
-    public void handleCharacters(Characters asCharacters) throws XMLStreamException;
+    void handleCharacters(Characters asCharacters) throws XMLStreamException;
 
 }

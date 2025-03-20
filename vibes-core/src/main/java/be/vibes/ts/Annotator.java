@@ -26,8 +26,8 @@ package be.vibes.ts;
  */
 public interface Annotator {
 
-    public void annotate(TransitionSystem ts);
+    void annotate(TransitionSystem ts);
 
-    public boolean isAnnotated(TransitionSystem ts);
+    boolean isAnnotated(TransitionSystem ts);
 
 }

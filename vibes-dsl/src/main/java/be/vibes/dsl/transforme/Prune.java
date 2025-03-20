@@ -100,7 +100,7 @@ public class Prune {
     }
 
     
-    public static FeaturedTransitionSystem prune(FeaturedTransitionSystem fts, FeatureModel fm, TestSet testSet) {
+    public static FeaturedTransitionSystem prune(FeaturedTransitionSystem fts, FeatureModel<?> fm, TestSet testSet) {
         List<Execution> executions = Lists.newArrayList();
         for (TestCase tc : testSet) {
             executions.addAll(Execute.execute(fts, fm, tc));
@@ -108,7 +108,7 @@ public class Prune {
         return prune(fts, executions);
     }
 
-    public static TransitionSystem prune(FeaturedTransitionSystem fts, FeatureModel fm, TestCase testcase) {
+    public static TransitionSystem prune(FeaturedTransitionSystem fts, FeatureModel<?> fm, TestCase testcase) {
         return prune(fts, Execute.execute(fts, fm, testcase));
     }
 

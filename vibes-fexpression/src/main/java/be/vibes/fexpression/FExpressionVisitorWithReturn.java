@@ -31,7 +31,7 @@ public interface FExpressionVisitorWithReturn<E> {
 
     public E constant(boolean val) throws FExpressionException;
 
-    public E feature(Feature feature) throws FExpressionException;
+    public E feature(Feature<?> feature) throws FExpressionException;
 
     public E not(FExpression expr) throws FExpressionException;
 

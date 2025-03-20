@@ -86,7 +86,7 @@ public class DimacsModel {
         this.fd = fd.toCnf();
         featureMapping = HashBiMap.create();
         int i = 1;
-        for (Feature f : fd.getFeatures()) {
+        for (Feature<?> f : fd.getFeatures()) {
             featureMapping.put(f.getFeatureName(), i);
             i++;
         }
@@ -198,7 +198,7 @@ public class DimacsModel {
             if (tab.length > 0) {
                 FExpression disj = null;
                 for (int f : tab) {
-                    Feature feat;
+                    Feature<?> feat;
                     if (f > 0) {
                         feat = feature(featureMapping.inverse().get(f));
                         if (disj == null) {
