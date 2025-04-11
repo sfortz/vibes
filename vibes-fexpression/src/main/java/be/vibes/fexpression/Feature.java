@@ -2,6 +2,7 @@ package be.vibes.fexpression;
 
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
+import com.google.common.base.Objects;
 import de.vill.config.Configuration;
 import de.vill.model.Attribute;
 import de.vill.model.FeatureType;
@@ -610,6 +611,7 @@ public class Feature<F extends Feature<F>>{
         return feature;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Feature)) {
@@ -659,5 +661,26 @@ public class Feature<F extends Feature<F>>{
         }
 
         return true;
+    }*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Feature<?> feature = (Feature<?>) o;
+        return Objects.equal(getFeatureName(), feature.getFeatureName()) && Objects.equal(getChildren(), feature.getChildren()) && getFeatureType() == feature.getFeatureType() && Objects.equal(getExclusions(), feature.getExclusions()) && Objects.equal(getRequirements(), feature.getRequirements());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getFeatureName(), getChildren(), getFeatureType(), getExclusions(), getRequirements());
+    }
+
+/*
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getFeatureName(), getChildren(), parent, getExclusions(), getRequirements());
+        //return Objects.hashCode(getFeatureName(), getNameSpace(), getRelatedImport(), getLowerBound(), getUpperBound(), getChildren(), getAttributes(), getFeatureType(), isSubmodelRoot(), getExclusions(), getRequirements());
+
+        //return Objects.hashCode(getFeatureName(), getNameSpace(), getRelatedImport(), getLowerBound(), getUpperBound(), getChildren(), getAttributes(), getFeatureType(), isSubmodelRoot(), parent, getExclusions(), getRequirements());
+    }*/
 }

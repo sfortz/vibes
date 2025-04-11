@@ -1,6 +1,7 @@
 package be.vibes.solver;
 
 import be.vibes.fexpression.Feature;
+import com.google.common.base.Objects;
 import de.vill.config.Configuration;
 import de.vill.util.Util;
 
@@ -310,6 +311,7 @@ public class Group<F extends Feature<F>> {
         this.parent = parent;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Group)) {
@@ -340,5 +342,30 @@ public class Group<F extends Feature<F>> {
         }
 
         return true;
+    }*/
+
+    /*
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Group<?> group = (Group<?>) o;
+        return GROUPTYPE == group.GROUPTYPE && Objects.equal(getFeatures(), group.getFeatures()) && Objects.equal(parent, group.parent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(GROUPTYPE, getFeatures(), getLowerBound(), getUpperBound(), parent);
+    }*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Group<?> group = (Group<?>) o;
+        return GROUPTYPE == group.GROUPTYPE && Objects.equal(getFeatures(), group.getFeatures());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(GROUPTYPE, getFeatures());
     }
 }
