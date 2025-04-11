@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fm namespace="Card_Payment_Terminal">
+    <feature name="CPTerminal">
+        <mandatory>
+            <feature name="PaymentSchema">
+                <or>
+                    <feature name="DirectDebit">
+                        <or>
+                            <feature name="DebitCard"></feature>
+                            <feature name="EPurse"></feature>
+                            <feature name="PrepaidCard"></feature>
+                        </or>
+                    </feature>
+                    <feature name="CreditCard"></feature>
+                </or>
+            </feature>
+        </mandatory>
+        <mandatory>
+            <feature name="Connectivity">
+                <or>
+                    <feature name="Online">
+                        <or>
+                            <feature name="PSTN"></feature>
+                            <feature name="Mobile3G"></feature>
+                            <feature name="VPN"></feature>
+                            <feature name="PrivateWAN"></feature>
+                        </or>
+                    </feature>
+                    <feature name="Offline"></feature>
+                </or>
+            </feature>
+        </mandatory>
+        <mandatory>
+            <feature name="CardReader">
+                <or>
+                    <feature name="Chip"></feature>
+                    <feature name="MagStrip"></feature>
+                    <feature name="NFC"></feature>
+                </or>
+            </feature>
+        </mandatory>
+        <optional>
+            <feature name="Identification">
+                <optional>
+                    <feature name="PIN"></feature>
+                </optional>
+                <mandatory>
+                    <feature name="Signature"></feature>
+                </mandatory>
+            </feature>
+        </optional>
+        <feature_constraints>
+            <feature_constraint fexpression="(Identification || !CreditCard)"></feature_constraint>
+            <feature_constraint fexpression="(PIN || !DebitCard)"></feature_constraint>
+            <feature_constraint fexpression="(NFC || (Chip || !EPurse))"></feature_constraint>
+            <feature_constraint fexpression="(NFC || (Chip || !PrepaidCard))"></feature_constraint>
+        </feature_constraints>
+    </feature>
+</fm>

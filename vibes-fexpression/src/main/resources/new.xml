@@ -11,9 +11,8 @@
                     <feature name="Camera"></feature>
                 </alternative>
                 <feature_constraints>
-                    <exclusions>
-                        <exclude conflict1="Lidar" conflict2="Camera"></exclude>
-                    </exclusions>
+                    <feature_constraint fexpression="(Lidar || Camera)"></feature_constraint>
+                    <feature_constraint fexpression="(!Lidar || !Camera)"></feature_constraint>
                 </feature_constraints>
             </feature>
         </mandatory>
@@ -21,12 +20,9 @@
             <feature name="Cleaning"></feature>
         </mandatory>
         <feature_constraints>
-            <exclusions>
-                <exclude conflict1="Cleaning" conflict2="Lidar"></exclude>
-            </exclusions>
-            <requirements>
-                <requires feature="Cleaning" dependency="Mapping"></requires>
-            </requirements>
+            <feature_constraint fexpression="(Lidar || Cleaning)"></feature_constraint>
+            <feature_constraint fexpression="(!Lidar || !Cleaning)"></feature_constraint>
+            <feature_constraint fexpression="(Mapping || Cleaning)"></feature_constraint>
         </feature_constraints>
     </feature>
 </fm>

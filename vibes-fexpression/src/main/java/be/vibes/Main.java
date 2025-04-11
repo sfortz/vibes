@@ -28,5 +28,9 @@ public class Main {
         FeatureModel fm = XmlLoaders.loadFeatureModel(file);
         XmlSavers.save(fm, dirPath + "new.xml");
 
+        File file2 = new File(dirPath + "cpterminal.xml");
+        FeatureModel fm2 = XmlLoaders.loadFeatureModel(file2);
+        XmlSavers.save(fm2, dirPath + "newcp.xml");
+
     }
 }
