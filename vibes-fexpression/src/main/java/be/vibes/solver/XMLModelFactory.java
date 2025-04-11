@@ -28,25 +28,6 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
         this.featureModel = featureModelSupplier.get();
     }
 
-    /*
-    public <G extends F> XMLModelFactory(Class<T> newFmType, FeatureModel<G> otherFM) {
-        //G extends Feature ?
-
-        Class[] cArg = new Class[1];
-        cArg[0] = otherFM.getClass();
-
-        // protected <G extends F> FeatureModel(FeatureModel<G> otherFM)
-
-        T fm = null;
-        try {
-            fm = newFmType.getDeclaredConstructor(cArg).newInstance(otherFM);
-            this.featureModel = fm;
-            this.solverType = fm.getSolver().getType();
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new FeatureModelDefinitionException(e.getMessage(), e);
-        }
-    }*/
-
     public void setNamespace(String namespace) {
         featureModel.setNamespace(namespace);
     }
@@ -76,8 +57,8 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
         return group;
     }
 
-    private Set<String> getRecursiveChildren(F f) {
-        Set<String> children = new HashSet<>();
+    private List<String> getRecursiveChildren(F f) {
+        List<String> children = new ArrayList<>();
         children.add(f.getFeatureName());
 
         for(Group<F> g: f.getChildren()){
@@ -104,7 +85,7 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
             );
         }
 
-        Set<String> children = getRecursiveChildren(lca);
+        List<String> children = getRecursiveChildren(lca);
 
         if(featureModel.getFeature(f1) == null || featureModel.getFeature(f2) == null){
             throw new FeatureModelDefinitionException("Constraints should only refers to features belonging to the FM.");
