@@ -11,7 +11,7 @@
     <name>VIBeS: featured expressions</name>
     <packaging>jar</packaging>
     <description>
-        This project contains utility classes to parse feature expressions. Fexpressions grammar is described in Fexpression.g
+        This project contains utility classes to parse feature expressions. Fexpressions grammar is described in Fexpression.g4
     </description>
 
     <dependencies>

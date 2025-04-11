@@ -1,7 +1,10 @@
 package be.vibes.ts.io.dot;
 
-import be.vibes.ts.TransitionSystem;
-import be.vibes.ts.TransitionSystemFactory;
+import be.vibes.fexpression.FExpression;
+import be.vibes.fexpression.ParserUtil;
+import be.vibes.fexpression.exception.ParserException;
+import be.vibes.ts.FeaturedTransitionSystem;
+import be.vibes.ts.FeaturedTransitionSystemFactory;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -10,27 +13,19 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TransitionSystemDotHandler extends DOTBaseListener {
-
-    protected TransitionSystemFactory tsFactory;
-
-    protected TransitionSystemDotHandler() {}
-
-    protected void createFactory(String initialState){
-        tsFactory = new TransitionSystemFactory(initialState);
-    }
+/**
+ * Parses DOT files representing featured transition systems.
+ * Extracts transitions with labels formatted as: action/featureExpr.
+ */
+public class FeaturedTransitionSystemDotHandler extends TransitionSystemDotHandler {
 
     @Override
-    public void enterNode_stmt(DOTParser.Node_stmtContext ctx) {
-        String nodeName = ctx.getChild(0).getText();
-        if (tsFactory == null){
-            createFactory(nodeName);
-        }
-        tsFactory.addState(nodeName);
+    protected void createFactory(String initialState){
+        tsFactory = new FeaturedTransitionSystemFactory(initialState);
     }
 
     @Override
@@ -52,21 +47,34 @@ public class TransitionSystemDotHandler extends DOTBaseListener {
 
                 String raw = (ctx.attr_list() != null) ? ctx.attr_list().getText() : null;
                 String actionName = "τ";
+                FExpression fexpr = FExpression.trueValue(); // default feature expression
                 if (raw != null) {
                     Matcher m = Pattern.compile("label\\s*=\\s*\"([^\"]*)\"").matcher(raw);
                     if (m.find()) {
                         String extracted = m.group(1).trim();
                         if (!extracted.isEmpty()) {
-                            actionName = extracted;
+                            //actionName = extracted;
+
+                            String[] parts = extracted.split("/", 2);
+                            actionName = parts[0].trim();
+                            if (parts.length > 1) {
+                                String expr = parts[1].trim();
+                                try {
+                                    fexpr = ParserUtil.getInstance().parse(expr);
+                                } catch (ParserException e) {
+                                    throw new RuntimeException("Should not happen! Error parsing expression: ", e);
+                                }
+                            }
                         }
                     }
                 }
-                tsFactory.addTransition(sourceName, actionName, targetName);
+
+                getFactory().addTransition(sourceName, actionName, fexpr, targetName);
             }
         }
     }
 
-    public static TransitionSystem parseDotFile(String filename) throws IOException {
+    public static FeaturedTransitionSystem parseDotFile(String filename) throws IOException {
         FileInputStream fis = new FileInputStream(filename);
         CharStream input = CharStreams.fromStream(fis);
         DOTLexer lexer = new DOTLexer(input);
@@ -76,6 +84,11 @@ public class TransitionSystemDotHandler extends DOTBaseListener {
         FeaturedTransitionSystemDotHandler listener = new FeaturedTransitionSystemDotHandler();
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);
-        return listener.tsFactory.build();
+        FeaturedTransitionSystemFactory ftsFactory = (FeaturedTransitionSystemFactory) listener.tsFactory;
+        return ftsFactory.build();
+    }
+
+    private FeaturedTransitionSystemFactory getFactory(){
+        return (FeaturedTransitionSystemFactory) this.tsFactory;
     }
 }
