@@ -92,12 +92,13 @@ public class UVLModelFactory {
     }
 
     private void validateTypeLevelConstraints(final FeatureModel<?> featureModel) {
+        /*
         final List<Constraint> constraints = featureModel.getOwnConstraints();
         for (final Constraint constraint: constraints) {
             if (!validateTypeLevelConstraint(constraint)) {
                 throw new ParseError("Invalid Constraint in line - " + constraint.getLineNumber());
             }
-        }
+        }*/
     }
 
     private boolean validateTypeLevelConstraint(final Constraint constraint) {

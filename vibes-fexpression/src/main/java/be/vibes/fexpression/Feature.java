@@ -2,7 +2,7 @@ package be.vibes.fexpression;
 
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
-import com.google.common.base.Objects;
+import java.util.Objects;
 import de.vill.config.Configuration;
 import de.vill.model.Attribute;
 import de.vill.model.FeatureType;
@@ -31,8 +31,9 @@ public class Feature<F extends Feature<F>>{
     private boolean isSubmodelRoot = false;
 
     private Group<F> parent;
-    private final List<ExclusionConstraint> exclusions = new LinkedList<>();
-    private final List<RequirementConstraint> requirements = new LinkedList<>();
+    private final List<FExpression> constraints = new LinkedList<>();
+    //private final List<ExclusionConstraint> exclusions = new LinkedList<>();
+    //private final List<RequirementConstraint> requirements = new LinkedList<>();
 
 
     /**
@@ -537,7 +538,15 @@ public class Feature<F extends Feature<F>>{
         return null;
     }
 
+    public List<FExpression> getConstraints() {
+        return constraints;
+    }
 
+    public int getNumberOfConstraints(){
+        return constraints.size();
+    }
+
+    /*
     public List<ExclusionConstraint> getExclusions() {
         return exclusions;
     }
@@ -556,7 +565,7 @@ public class Feature<F extends Feature<F>>{
 
     public int getNumberOfRequirementConstraints(){
         return requirements.size();
-    }
+    }*/
 
     private String cardinalityToString() {
         StringBuilder result = new StringBuilder();
@@ -667,12 +676,12 @@ public class Feature<F extends Feature<F>>{
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Feature<?> feature = (Feature<?>) o;
-        return Objects.equal(getFeatureName(), feature.getFeatureName()) && Objects.equal(getChildren(), feature.getChildren()) && getFeatureType() == feature.getFeatureType() && Objects.equal(getExclusions(), feature.getExclusions()) && Objects.equal(getRequirements(), feature.getRequirements());
+        return Objects.equals(getFeatureName(), feature.getFeatureName()) && Objects.equals(getChildren(), feature.getChildren()) && getFeatureType() == feature.getFeatureType() && Objects.equals(getConstraints(), feature.getConstraints()); //Objects.equal(getExclusions(), feature.getExclusions()) && Objects.equal(getRequirements(), feature.getRequirements());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getFeatureName(), getChildren(), getFeatureType(), getExclusions(), getRequirements());
+        return Objects.hash(getFeatureName(), getChildren(), getFeatureType(), getConstraints()); //getExclusions(), getRequirements());
     }
 
 /*

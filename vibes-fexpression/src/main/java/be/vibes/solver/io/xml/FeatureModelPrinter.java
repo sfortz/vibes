@@ -1,5 +1,6 @@
 package be.vibes.solver.io.xml;
 
+import be.vibes.fexpression.FExpression;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.constraints.ExclusionConstraint;
 import be.vibes.solver.constraints.RequirementConstraint;
@@ -41,14 +42,18 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
             printElement(xtw, group);
         }
 
-        if(feature.getTotalNumberOfConstraints() > 0){
+        if(feature.getNumberOfConstraints() > 0){
             xtw.writeStartElement(FEATURE_CONSTRAINTS_TAG);
+            for (FExpression fexpr : feature.getConstraints()) {
+                printElement(xtw, fexpr);
+            }
+            /*
             if(feature.getNumberOfExclusionConstraints() > 0){
                 printExclusions(xtw, feature.getExclusions());
             }
             if(feature.getNumberOfRequirementConstraints() > 0){
                 printRequirements(xtw, feature.getRequirements());
-            }
+            }*/
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
@@ -72,6 +77,15 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
         xtw.writeEndElement();
     }
 
+    @Override
+    public void printElement(XMLStreamWriter xtw, FExpression fexpr) throws XMLStreamException {
+        LOG.trace("Printing constraint element");
+        xtw.writeStartElement(FEATURE_CONSTRAINT_TAG);
+        xtw.writeAttribute(FEXPRESSION_ATTR, fexpr.toString());
+        xtw.writeEndElement();
+    }
+
+    /*
     @Override
     public void printExclusions(XMLStreamWriter xtw, List<ExclusionConstraint> exclusions) throws XMLStreamException {
         xtw.writeStartElement(EXCLUSIONS_TAG);
@@ -106,5 +120,5 @@ public class FeatureModelPrinter implements FeatureModelElementPrinter{
         xtw.writeAttribute(FEATURE_ATTR, constraint.getRight().getLiteral());
         xtw.writeAttribute(DEPENDENCY_ATTR, constraint.getLeft().getLiteral());
         xtw.writeEndElement();
-    }
+    }*/
 }

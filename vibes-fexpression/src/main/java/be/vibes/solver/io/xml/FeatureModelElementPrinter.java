@@ -1,5 +1,6 @@
 package be.vibes.solver.io.xml;
 
+import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.Feature;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.constraints.ExclusionConstraint;
@@ -16,11 +17,13 @@ public interface FeatureModelElementPrinter {
 
     void printElement(XMLStreamWriter xtw, Group<?> group) throws XMLStreamException;
 
-    void printExclusions(XMLStreamWriter xtw, List<ExclusionConstraint> exclusions) throws XMLStreamException;
+    //void printExclusions(XMLStreamWriter xtw, List<ExclusionConstraint> exclusions) throws XMLStreamException;
 
-    void printRequirements(XMLStreamWriter xtw, List<RequirementConstraint> requirements) throws XMLStreamException;
+    //void printRequirements(XMLStreamWriter xtw, List<RequirementConstraint> requirements) throws XMLStreamException;
 
-    void printElement(XMLStreamWriter xtw, ExclusionConstraint constraint) throws XMLStreamException;
+    void printElement(XMLStreamWriter xtw, FExpression fexpr) throws XMLStreamException;
 
-    void printElement(XMLStreamWriter xtw, RequirementConstraint constraint) throws XMLStreamException;
+   //void printElement(XMLStreamWriter xtw, ExclusionConstraint constraint) throws XMLStreamException;
+
+    //void printElement(XMLStreamWriter xtw, RequirementConstraint constraint) throws XMLStreamException;
 }

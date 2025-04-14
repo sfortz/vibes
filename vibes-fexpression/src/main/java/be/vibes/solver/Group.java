@@ -1,15 +1,11 @@
 package be.vibes.solver;
 
 import be.vibes.fexpression.Feature;
-import com.google.common.base.Objects;
 import de.vill.config.Configuration;
 import de.vill.util.Util;
 
 import java.io.Serial;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * This class represents all kinds of groups (or, alternative, mandatory,
@@ -361,11 +357,11 @@ public class Group<F extends Feature<F>> {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Group<?> group = (Group<?>) o;
-        return GROUPTYPE == group.GROUPTYPE && Objects.equal(getFeatures(), group.getFeatures());
+        return GROUPTYPE == group.GROUPTYPE && Objects.equals(getFeatures(), group.getFeatures());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(GROUPTYPE, getFeatures());
+        return Objects.hash(GROUPTYPE, getFeatures());
     }
 }

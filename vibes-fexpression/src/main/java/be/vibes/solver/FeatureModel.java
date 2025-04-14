@@ -9,8 +9,6 @@ import de.vill.model.constraint.Constraint;
 import de.vill.util.Util;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 import static de.vill.util.Util.addNecessaryQuotes;
 
 /**
@@ -22,7 +20,8 @@ public class FeatureModel<F extends Feature<F>> {
     private String namespace;
     private F rootFeature;
     private final Map<String, F> featureMap = new HashMap<>();
-    private final List<Constraint> ownConstraints = new LinkedList<>();
+    private final List<FExpression> ownConstraints = new LinkedList<>();
+    //private final List<Constraint> ownConstraints = new LinkedList<>();
     private SolverFacade solver;
 
     /**
@@ -170,9 +169,14 @@ public class FeatureModel<F extends Feature<F>> {
      *
      * @return A list of the constraints of this featuremodel.
      */
-    public List<Constraint> getOwnConstraints() {
+    public List<FExpression> getOwnConstraints() {
         return ownConstraints;
     }
+    /*
+        public List<Constraint> getOwnConstraints() {
+            return ownConstraints;
+        }
+    */
 
     /**
      * A list with all the constraints of that are part of feature attributes of
@@ -181,6 +185,7 @@ public class FeatureModel<F extends Feature<F>> {
      *
      * @return A list of the constraints of featureattributes in this featuremodel.
      */
+    /*
     public List<Constraint> getFeatureConstraints() {
         return getFeatureConstraints(getRootFeature());
     }
@@ -203,7 +208,7 @@ public class FeatureModel<F extends Feature<F>> {
             }
         }
         return featureConstraints;
-    }
+    }*/
 
     /**
      * A list will all constraints of this featuremodel and recursively of all its
@@ -217,12 +222,18 @@ public class FeatureModel<F extends Feature<F>> {
      *
      * @return a list will all constraints of this feature model.
      */
+    public List<FExpression> getConstraints() {
+        List<FExpression> constraints = new LinkedList<>();
+        constraints.addAll(ownConstraints);
+        return constraints;
+    }
+    /*
     public List<Constraint> getConstraints() {
         List<Constraint> constraints = new LinkedList<Constraint>();
         constraints.addAll(ownConstraints);
         constraints.addAll(getFeatureConstraints());
         return constraints;
-    }
+    }*/
 
     /**
      * Prints the current featuremodel without composing it with the other models.
@@ -254,7 +265,8 @@ public class FeatureModel<F extends Feature<F>> {
             result.append(Configuration.getNewlineSymbol());
         }
 
-        List<Constraint> constraintList;
+        //List<Constraint> constraintList;
+        List<FExpression> constraintList;
         if (withSubmodels) {
             constraintList = new LinkedList<>(ownConstraints);
         } else {
@@ -263,10 +275,13 @@ public class FeatureModel<F extends Feature<F>> {
         if (!constraintList.isEmpty()) {
             result.append("constraints");
             result.append(Configuration.getNewlineSymbol());
-            for (Constraint constraint : constraintList) {
-                result.append(Configuration.getTabulatorSymbol());
-                result.append(constraint.toString(withSubmodels, currentAlias));
-                result.append(Configuration.getNewlineSymbol());
+            //for (Constraint constraint : constraintList) {
+                //result.append(Configuration.getTabulatorSymbol());
+                //result.append(constraint.toString(withSubmodels, currentAlias));
+                //result.append(Configuration.getNewlineSymbol());
+            //}
+            for (FExpression constraint : constraintList) {
+                result.append(constraint.toString());
             }
         }
 
@@ -291,14 +306,17 @@ public class FeatureModel<F extends Feature<F>> {
             return false;
         }
 
+        return Objects.equals(this.getOwnConstraints(), ((FeatureModel<?>) obj).getOwnConstraints());
+
+        /*
         List<Constraint> objConstraints = ((FeatureModel<?>) obj).getOwnConstraints();
         for (final Constraint constraint : this.getOwnConstraints()) {
             if (!objConstraints.contains(constraint)) {
                 return false;
             }
-        }
+        }*/
 
-        return true;
+        //return true;
     }
 
 
@@ -383,28 +401,52 @@ public class FeatureModel<F extends Feature<F>> {
         return null;
     }
 
-    public F getLeastCommonAncestor (List<FExpression> fExpressions){
-
-        FExpression disjunction = FExpression.falseValue();
-
-        for (FExpression fexp: fExpressions){
-            disjunction.orWith(fexp);
+    public F getLeastCommonAncestor(List<FExpression> fExpressions) {
+        // Shortcut: if any expression is true, the root feature is the LCA
+        if(fExpressions.contains(FExpression.trueValue())){
+            return this.getRootFeature();
         }
 
+        // Build the disjunction of all simplified expressions
+        FExpression disjunction = FExpression.falseValue();
+        for (FExpression fexp : fExpressions) {
+            disjunction.orWith(fexp.applySimplification());
+        }
+
+        // Simplify the final disjunction
         disjunction = disjunction.toCnf().applySimplification();
 
         if (disjunction.isTrue()) {
             return this.getRootFeature();
+        } else if (disjunction.isFalse()) {
+            return null;
         }
 
-        Set<F> features = disjunction.getFeatures().stream().map(f -> this.getFeature(f.getFeatureName())).collect(Collectors.toSet());
+        Set<Feature<?>> negativeFeaturesSet = new HashSet<>(disjunction.getNegatedFeatures());
+        Set<F> featureSet = new HashSet<>();
 
-        Iterator<F> iterator = features.iterator();
+        for (Feature<?> f : disjunction.getFeatures()) {
+
+            F baseFeature = this.getFeature(f.getFeatureName());
+            if (negativeFeaturesSet.contains(f)) {
+                baseFeature = (F) baseFeature.getParentFeature();
+            }
+
+            featureSet.add(baseFeature);
+        }
+
+        if (featureSet.isEmpty()) {
+            return null;
+        }
+
+        // Compute least common ancestor from the feature set
+        Iterator<F> iterator = featureSet.iterator();
         F lca = iterator.next();
 
         while (iterator.hasNext()) {
             lca = leastCommonAncestor(lca, iterator.next());
         }
+
         return lca;
     }
 

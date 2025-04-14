@@ -69,6 +69,31 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
         return children;
     }
 
+    public void addConstraint(F lca, FExpression fexpr) {
+
+        if(featureModel.getFeature(lca.getFeatureName()) == null){
+            throw new FeatureModelDefinitionException( "Impossible to add the new constraint. Feature " + lca.getFeatureName() + " is not part of the FM.");
+        }
+
+        List<String> children = getRecursiveChildren(lca);
+        Set<Feature<?>> features = fexpr.getFeatures();
+
+        for(Feature<?> f: features){
+            String fName = f.getFeatureName();
+            if(featureModel.getFeature(fName) == null){
+                throw new FeatureModelDefinitionException("Constraints should only refers to features belonging to the FM.");
+            }
+
+            if (!new HashSet<>(children).contains(fName)) {
+                throw new FeatureModelDefinitionException("Feature constraints should only refer to sub-features of " + lca.getFeatureName() + ".");
+            }
+        }
+
+        lca.getConstraints().add(fexpr);
+        featureModel.getOwnConstraints().add(fexpr);
+    }
+
+    /*
     public ExclusionConstraint addExclusionConstraint(F lca, String f1, String f2) {
         return addConstraint(lca, f1, f2, "Exclusion");
     }
@@ -114,7 +139,7 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
                 return (C) constraint;
             default: throw new FeatureModelDefinitionException("Unknown type of constraints!");
         }
-    }
+    }*/
 
     /*
     public Constraint addExclusionConstraint(Feature f1, Feature f2) {
@@ -278,9 +303,13 @@ public abstract class XMLModelFactory<F extends Feature<F>, T extends FeatureMod
         if(featureModel.getSolver() == null){
             FExpression fexp = buildFExpression(featureModel.getRootFeature());
 
+            for(FExpression constr: featureModel.getOwnConstraints()){
+                fexp.andWith(constr);
+            }
+            /*
             for(Constraint constr: featureModel.getOwnConstraints()){
                 fexp.andWith(buildFExpression(constr));
-            }
+            }*/
 
             featureModel.setSolver(getSolverFacade(fexp));
         }

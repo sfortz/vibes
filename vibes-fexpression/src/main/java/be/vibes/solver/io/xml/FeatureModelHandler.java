@@ -1,6 +1,9 @@
 package be.vibes.solver.io.xml;
 
+import be.vibes.fexpression.FExpression;
 import be.vibes.fexpression.Feature;
+import be.vibes.fexpression.ParserUtil;
+import be.vibes.fexpression.exception.ParserException;
 import be.vibes.solver.FeatureModelFactory;
 import be.vibes.solver.Group;
 import be.vibes.solver.FeatureModel;
@@ -9,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
@@ -23,17 +27,21 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
     public static final String OR_TAG = "or";
 
     public static final String FEATURE_CONSTRAINTS_TAG = "feature_constraints";
+    public static final String FEATURE_CONSTRAINT_TAG = "feature_constraint";
+    /*
     public static final String EXCLUSIONS_TAG = "exclusions";
     public static final String EXCLUDE_TAG = "exclude";
     public static final String REQUIREMENTS_TAG = "requirements";
-    public static final String REQUIRES_TAG = "requires";
+    public static final String REQUIRES_TAG = "requires";*/
 
     public static final String NAMESPACE_ATTR = "namespace";
     public static final String NAME_ATTR = "name";
+    public static final String FEXPRESSION_ATTR = "fexpression";
+    /*
     public static final String CONFLICT1_ATTR = "conflict1"; //TODO: For more expressiveness, we could add al type of FExpressions
     public static final String CONFLICT2_ATTR = "conflict2";
     public static final String FEATURE_ATTR = "feature";
-    public static final String DEPENDENCY_ATTR = "dependency";
+    public static final String DEPENDENCY_ATTR = "dependency";*/
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureModelHandler.class);
 
@@ -82,8 +90,12 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
                 handleStartAlternativeTag(element);
                 break;
             case FEATURE_CONSTRAINTS_TAG:
-                handleStartFConstraintTag();
+                handleStartFConstraintsTag();
                 break;
+            case FEATURE_CONSTRAINT_TAG:
+                handleStartFConstraintTag(element);
+                break;
+                /*
             case EXCLUSIONS_TAG:
                 handleStartExclusionsTag();
                 break;
@@ -95,7 +107,7 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
                 break;
             case REQUIRES_TAG:
                 handleStartRequiresTag(element);
-                break;
+                break;*/
             default:
                 LOG.debug("Unknown element: {}", tag);
         }
@@ -108,10 +120,24 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
         factory.setNamespace(namespace);
     }
 
-    protected void handleStartFConstraintTag() throws XMLStreamException {
+    protected void handleStartFConstraintsTag() throws XMLStreamException {
         LOG.trace("Starting Feature Constraints");
     }
 
+    protected void handleStartFConstraintTag(StartElement element) throws XMLStreamException {
+        LOG.trace("Processing Feature Expression");
+        String expr = element.getAttributeByName(QName.valueOf(FEXPRESSION_ATTR)).getValue();
+        FExpression fexpr;
+        try {
+            fexpr = ParserUtil.getInstance().parse(expr);
+        } catch (ParserException e) {
+            LOG.error("Exception while parsing fexpression {}!", expr, e);
+            throw new XMLStreamException("Exception while parsing fexpression " + expr, e);
+        }
+        factory.addConstraint(featureStack.peek(), fexpr);
+    }
+
+        /*
     protected void handleStartExclusionsTag() throws XMLStreamException {
         LOG.trace("Starting Exclusions");
     }
@@ -132,7 +158,7 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
         String feature = element.getAttributeByName(QName.valueOf(FEATURE_ATTR)).getValue();
         String dependency = element.getAttributeByName(QName.valueOf(DEPENDENCY_ATTR)).getValue();
         factory.addRequirementConstraint(featureStack.peek(), feature, dependency);
-    }
+    }*/
 
     protected void handleStartFeatureTag(StartElement element) throws XMLStreamException {
         LOG.trace("Processing feature");
@@ -181,13 +207,13 @@ public class FeatureModelHandler <F extends Feature<F>> implements XmlEventHandl
             case MANDATORY_TAG, OPTIONAL_TAG, OR_TAG, ALTERNATIVE_TAG:
                 LOG.trace("Ending group");
                 groupStack.pop();
-                break;
+                break;/*
             case EXCLUDE_TAG:
                 LOG.trace("Ending Exclusion");
                 break;
             case REQUIRES_TAG:
                 LOG.trace("Ending Requirement");
-                break;
+                break;*/
             case FM_TAG:
                 LOG.trace("Ending feature model");
                 break;

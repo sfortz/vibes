@@ -68,6 +68,25 @@ public class FExpression {
         return ExprUtil.getVariables(expression);
     }
 
+    public Set<Feature<?>> getNegatedFeatures() {
+        Set<Feature<?>> negatedFeatures = new HashSet<>();
+        collectNegatedFeatures(expression, negatedFeatures);
+        return negatedFeatures;
+    }
+
+    private void collectNegatedFeatures(Expression<Feature<?>> expr, Set<Feature<?>> negatedFeatures) {
+        if (expr instanceof Not) {
+            Expression<Feature<?>> inner = ((Not<Feature<?>>) expr).getE();
+            if (inner instanceof Variable) {
+                negatedFeatures.add(((Variable<Feature<?>>) inner).getValue());
+            }
+        } else {
+            for (Expression<Feature<?>> child : expr.getChildren()) {
+                collectNegatedFeatures(child, negatedFeatures);
+            }
+        }
+    }
+
     public boolean isTrue() {
         return expression.equals(Literal.getTrue());
     }
