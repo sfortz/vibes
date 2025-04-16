@@ -387,7 +387,7 @@ public class FeatureModel<F extends Feature<F>> {
         return ancestors;
     }
 
-    private F leastCommonAncestor(F f1, F f2) {
+    public F getLeastCommonAncestor(F f1, F f2) {
         List<F> ancestorsF1 = getAncestors(f1);
         List<F> ancestorsF2 = getAncestors(f2);
 
@@ -444,7 +444,7 @@ public class FeatureModel<F extends Feature<F>> {
         F lca = iterator.next();
 
         while (iterator.hasNext()) {
-            lca = leastCommonAncestor(lca, iterator.next());
+            lca = getLeastCommonAncestor(lca, iterator.next());
         }
 
         return lca;
