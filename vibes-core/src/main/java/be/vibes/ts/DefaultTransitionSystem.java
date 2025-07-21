@@ -5,6 +5,7 @@ package be.vibes.ts;
  * VIBeS: core
  * %%
  * Copyright (C) 2014 - 2018 University of Namur
+ * Copyright 2025 Sophie Fortz
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

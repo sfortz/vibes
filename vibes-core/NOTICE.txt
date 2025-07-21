@@ -1,0 +1,48 @@
+NOTICE file for the vibes-core module
+=====================================
+
+This product includes software developed at the University of Namur,
+distributed under the Apache License, Version 2.0.
+
+Modifications have been made in 2025 by Sophie Fortz to adapt and extend the module.
+These include:
+
+  - Cleanup of code to align with modern Java standards
+  - Refactoring I/O classes to support updated feature model structures (including UVL integration)
+  - Adding missing functionalities, such as the ability to read and write both TS and FTS in DOT format
+
+All source files modified or newly created in this module are covered by the Apache License, Version 2.0 — with the following exception:
+The file `src/main/antlr4/be/vibes/ts/io/dot/DOT.g4` is licensed under the BSD license.
+All other files in this module remain unchanged and retain their original authorship.
+
+For licensing terms, see the LICENSE file.
+
+---
+
+MODIFIED files:
+- pom.xml
+- src/main/java/be/vibes/ts/Annotator.java
+- src/main/java/be/vibes/ts/DefaultTransitionSystem.java
+- src/main/java/be/vibes/ts/TransitionSystemModelStatistics.java
+- src/main/java/be/vibes/ts/coverage/ActionCoverage.java
+- src/main/java/be/vibes/ts/coverage/StateCoverage.java
+- src/main/java/be/vibes/ts/coverage/StructuralCoverage.java
+- src/main/java/be/vibes/ts/coverage/TransitionCoverage.java
+- src/main/java/be/vibes/ts/coverage/TransitionPair.java
+- src/main/java/be/vibes/ts/coverage/TransitionPairCoverage.java
+- src/main/java/be/vibes/ts/execution/FeaturedTransitionSystemExecutor.java
+- src/main/java/be/vibes/ts/io/dot/FeaturedTransitionSystemDotPrinter.java
+- src/main/java/be/vibes/ts/io/xml/FeaturedTransitionSystemHandler.java
+- src/main/java/be/vibes/ts/io/xml/FeaturedTransitionSystemPrinter.java
+- src/main/java/be/vibes/ts/io/xml/FtsTestCaseHandler.java
+- src/main/java/be/vibes/ts/io/xml/TestSetXmlLoader.java
+- src/main/java/be/vibes/ts/io/xml/TestSetXmlPrinter.java
+- src/main/java/be/vibes/ts/io/xml/TransitionSystemXmlPrinter.java
+- src/main/java/be/vibes/ts/io/xml/XmlEventHandler.java
+- src/main/java/be/vibes/ts/io/xml/XmlLoaders.java
+
+NEW files:
+- src/main/antlr4/be/vibes/ts/io/dot/DOT.g4
+- src/main/java/be/vibes/ts/io/dot/DotSavers.java
+- src/main/java/be/vibes/ts/io/dot/FeaturedTransitionSystemDotHandler.java
+- src/main/java/be/vibes/ts/io/dot/TransitionSystemDotHandler.java

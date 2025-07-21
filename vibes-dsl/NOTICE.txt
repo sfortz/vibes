@@ -1,0 +1,36 @@
+NOTICE file for the vibes-dsl module
+====================================
+
+This product includes software developed at the University of Namur,
+distributed under the Apache License, Version 2.0.
+
+Modifications have been made in 2025 by Sophie Fortz to reflect architectural
+evolution in the underlying data structures (e.g., adaptations to SolverFacade).
+
+The following files have been modified:
+
+  - src/main/java/be/vibes/dsl/exception/ActionDefinitionException.java
+  - src/main/java/be/vibes/dsl/exception/ExecutionException.java
+  - src/main/java/be/vibes/dsl/exception/MutantDefinitionException.java
+  - src/main/java/be/vibes/dsl/exception/MutantExecutionException.java
+  - src/main/java/be/vibes/dsl/exception/StateDefinitionException.java
+  - src/main/java/be/vibes/dsl/exception/TestCaseDefinitionException.java
+  - src/main/java/be/vibes/dsl/exception/TransformationException.java
+  - src/main/java/be/vibes/dsl/exception/TransitionDefinitionException.java
+  - src/main/java/be/vibes/dsl/exception/TransitionSystemIOException.java
+  - src/main/java/be/vibes/dsl/execution/Execute.java
+  - src/main/java/be/vibes/dsl/io/Xml.java
+  - src/main/java/be/vibes/dsl/selection/Dissimilar.java
+  - src/main/java/be/vibes/dsl/selection/Random.java
+  - src/main/java/be/vibes/dsl/test/TestCaseDefinition.java
+  - src/main/java/be/vibes/dsl/test/TestSetDefinition.java
+  - src/main/java/be/vibes/dsl/transforme/Prune.java
+  - src/main/java/be/vibes/dsl/ts/AbstractTransitionSystemDefinition.java
+  - src/main/java/be/vibes/dsl/ts/ActionDefinition.java
+  - src/main/java/be/vibes/dsl/ts/FeaturedTransitionSystemDefinition.java
+  - src/main/java/be/vibes/dsl/ts/StateDefinition.java
+  - src/main/java/be/vibes/dsl/ts/UsageModelDefinition.java
+
+All other files in this module remain unchanged and retain their original authorship.
+
+For licensing terms, see the LICENSE file.

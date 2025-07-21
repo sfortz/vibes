@@ -1,4 +1,12 @@
 
+This project is a fork of [VIBeS](https://github.com/xdevroey/vibes/), originally developed by Xavier Devroey.
+
+Modifications have been made by Sophie Fortz under the terms of the Apache License 2.0.
+
+See the LICENSE and NOTICE files for details.
+
+---
+
 This project aims at providing a framework to perform behavioural testing of SPLs.
 
 ![VIBeS Logo](logo-vibes.png)

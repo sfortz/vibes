@@ -1,0 +1,53 @@
+NOTICE file for the VIBES Project
+=================================
+
+This project includes software originally developed at the University of Namur,
+distributed under the Apache License, Version 2.0. This fork introduces
+modifications to the original project to support updated architectures and functionality.
+
+In 2025, substantial modifications were made by Sophie Fortz across several modules
+to modernize the codebase, improve modularity, and support new data structures
+such as those aligned with the UVL (Universal Variability Language) standard.
+
+Below is a summary of key changes per module:
+
+---
+
+vibes-core
+----------
+
+- Refactored I/O classes to support updated feature model structures (see `vibes-fexpression`)
+- Added support for reading and writing both TS and FTS models in DOT format
+- Cleaned up code to align with modern Java standards
+
+Note: The file `src/main/antlr4/be/vibes/ts/io/dot/DOT.g4` is licensed under the BSD license (© 2013 Terence Parr).
+All other files are covered by the Apache License, Version 2.0.
+
+---
+
+vibes-fexpression
+-----------------
+
+- Major architectural overhaul of the feature model to better align with the UVL standard
+- Clear separation of responsibilities between `SolverFacade` and `FeatureModel`
+- Introduced support for hierarchical features and feature groups
+- Improved I/O capabilities for feature models
+- Cleanup of code to align with modern Java standards
+
+These changes reflect substantial independent development while retaining aspects of the original structure.
+
+---
+
+vibes-dsl & vibes-selection
+---------------------------
+
+- Minor adjustments to support refactored feature model architecture (see `vibes-fexpression`)
+- Code changes limited to integration and compatibility improvements
+
+---
+
+Unless otherwise noted, all source files modified or newly created in this project
+are covered by the Apache License, Version 2.0. Original authorship and license
+notices have been retained wherever applicable.
+
+For full licensing terms, see the LICENSE file in each module.

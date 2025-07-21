@@ -1,0 +1,16 @@
+NOTICE file for the vibes-selection module
+==========================================
+
+This product includes software developed at the University of Namur,
+distributed under the Apache License, Version 2.0.
+
+Modifications have been made to the following files in 2025 by Sophie Fortz
+to accommodate changes in data structures (e.g., FeatureModel replaced by SolverFacade):
+
+  - src/main/java/be/vibes/selection/dissimilar/FtsDissimilarTestCaseSelector.java
+  - src/main/java/be/vibes/selection/dissimilar/FtsTestCaseDissimilarityComputor.java
+  - src/main/java/be/vibes/selection/random/FtsRandomTestCaseSelector.java
+
+All other files in this module remain unchanged and retain their original authorship.
+
+For licensing terms, see the LICENSE file.

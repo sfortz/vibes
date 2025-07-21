@@ -1,0 +1,74 @@
+NOTICE file for the vibes-fexpression module
+============================================
+
+This product includes software developed at the University of Namur,
+distributed under the Apache License, Version 2.0.
+
+Significant changes were made in 2025 by Sophie Fortz to adapt and extend the module.
+These include:
+  - Major architectural changes to the data model and interface structure.
+    In particular, the feature model structure has been redesigned to more closely align
+    with the UVL (Universal Variability Language) standard, improving integration and
+    import/export capabilities.
+
+  - Specific structural changes include:
+    * Clear separation of concerns between `SolverFacade` and `FeatureModel`
+    * Introduction of hierarchy within the `FeatureModel`
+    * Introduction of the notion of `Group`, enabling grouping of child features
+    * Continued restriction to Boolean feature models only
+
+  - Enhanced support for feature model I/O operations
+  - Code cleanup and modernization to align with current Java practices
+
+While the module retains some foundational structure and naming from the original,
+it now reflects substantial independent development.
+
+All source files modified or newly created in this module are covered by the Apache License, Version 2.0.
+All other files in this module remain unchanged and retain their original authorship.
+For licensing terms, see the LICENSE file.
+
+---
+
+MODIFIED files:
+- vibes-fexpression/pom.xml
+− vibes-fexpression/src/main/java/be/vibes/fexpression/DimacsFormatter.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/DimacsModel.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/FExpression.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/FExpressionVisitorWithReturn.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/Feature.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/configuration/Configuration.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/configuration/ConfigurationSet.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/configuration/SimpleConfiguration.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/exception/ConfigurationException.java
+− vibes-fexpression/src/main/java/be/vibes/fexpression/exception/ParserException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/BDDSolverFacade.java
+− vibes-fexpression/src/main/java/be/vibes/solver/FExpressionBDDBuilder.java
+− vibes-fexpression/src/main/java/be/vibes/solver/FeatureModel.java
+− vibes-fexpression/src/main/java/be/vibes/solver/Sat4JSolverFacade.java
+− vibes-fexpression/src/main/java/be/vibes/solver/exception/ConstraintNotFoundException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/exception/ConstraintSolvingException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/exception/FeatureModelDefinitionException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/{ → exception}/SolverFatalErrorException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/exception/SolverInitializationException.java
+− vibes-fexpression/src/main/java/be/vibes/solver/exception/SolverPanic.java
+
+NEW files:
+− vibes-fexpression/src/main/java/be/vibes/solver/FeatureModelFactory.java
+− vibes-fexpression/src/main/java/be/vibes/solver/Group.java
+− vibes-fexpression/src/main/java/be/vibes/solver/SolverFacade.java
+− vibes-fexpression/src/main/java/be/vibes/solver/SolverType.java
+− vibes-fexpression/src/main/java/be/vibes/solver/UVLModelFactory.java
+− vibes-fexpression/src/main/java/be/vibes/solver/XMLModelFactory.java
+− vibes-fexpression/src/main/java/be/vibes/solver/constraints/ExclusionConstraint.java
+− vibes-fexpression/src/main/java/be/vibes/solver/constraints/RequirementConstraint.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/uvl/UVLListener.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/FeatureModelElementPrinter.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/FeatureModelHandler.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/FeatureModelPrinter.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/FeatureModelXmlPrinter.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/XmlEventHandler.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/XmlLoaders.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/XmlReader.java
+− vibes-fexpression/src/main/java/be/vibes/solver/io/xml/XmlSavers.java
+
+
