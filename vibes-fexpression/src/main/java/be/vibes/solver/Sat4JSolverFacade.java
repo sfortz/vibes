@@ -5,6 +5,7 @@ package be.vibes.solver;
  * VIBeS: featured expressions
  * %%
  * Copyright (C) 2014 PReCISE, University of Namur
+ * Copyright 2025 Sophie Fortz
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +24,7 @@ import be.vibes.fexpression.DimacsFormatter;
 import be.vibes.fexpression.DimacsModel;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import be.vibes.solver.exception.SolverFatalErrorException;
 import org.sat4j.core.VecInt;
@@ -78,13 +75,14 @@ public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> 
     public Sat4JSolverFacade(File featureMapping) throws SolverInitializationException {
         // Read mapping to get the number of variables
         try {
-            model = DimacsModel.createFromTvlParserMappingFile(featureMapping);
+            this.model = DimacsModel.createFromTvlParserMappingFile(featureMapping);
         } catch (IOException e) {
             logger.debug("IOException while creating Sat4JSolverFacade", e);
             throw new SolverInitializationException(
                     "Could not load feature mapping file!", e);
         }
         initSolver();
+        loadDimacsFdModel();
     }
 
     public Sat4JSolverFacade(String dimacsModel, String featureMapping)
@@ -101,7 +99,7 @@ public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> 
 
         // Load the dimacs model
         try {
-            model = DimacsModel.createFromTvlParserGeneratedFiles(featureMapping, dimacsModel);
+            this.model = DimacsModel.createFromTvlParserGeneratedFiles(featureMapping, dimacsModel);
         } catch (IOException e) {
             logger.debug("IOException while creating Sat4JSolverFacade", e);
             throw new SolverInitializationException(
@@ -144,7 +142,7 @@ public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> 
 
     @Override
     public SolverType getType() {
-        return null;
+        return SolverType.SAT4J;
     }
 
     @Override
@@ -260,7 +258,7 @@ public class Sat4JSolverFacade implements SolverFacade, Iterator<Configuration> 
     @Override
     public Configuration next() {
         String featureName;
-        ArrayList<Feature> sol = Lists.newArrayList();
+        ArrayList<Feature<?>> sol = Lists.newArrayList();
         int[] m;
         m = this.solver.model();
         for (int j : m) {
