@@ -33,7 +33,7 @@ Structure separates the framework modules from the different executables jars cr
 
 ## Overview of Changes
 
-The fork introduces **significant architectural changes** to support integration with modern variability model standards, notably **UVL (Universal Variability Language)**.
+The fork introduces **significant architectural changes** to support integration with modern variability model standards, notably **[UVL (Universal Variability Language)](https://universal-variability-language.github.io/)**.
 
 ### ✨ Goals of the Modifications
 

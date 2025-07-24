@@ -16,7 +16,6 @@ package be.vibes.solver.io.xml;
  * limitations under the License.
  */
 
-import be.vibes.fexpression.Feature;
 import be.vibes.solver.FeatureModel;
 import be.vibes.solver.exception.FeatureModelDefinitionException;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ public class XmlLoaders {
     private static final Logger LOG = LoggerFactory.getLogger(XmlLoaders.class);
 
     public static FeatureModel<?> loadFeatureModel(InputStream in) throws FeatureModelDefinitionException {
-        FeatureModelHandler handler = new FeatureModelHandler();
+        FeatureModelHandler<?> handler = new FeatureModelHandler<>();
         try {
             XmlReader reader = new XmlReader(handler, in);
             reader.readDocument();
