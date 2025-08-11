@@ -695,17 +695,24 @@ public class Feature<F extends Feature<F>>{
 
     @Override
     public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof Feature<?> feature)) return false; // Allow subclasses
+        return Objects.equals(getFeatureName(), feature.getFeatureName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFeatureName());
+    }
+
+    /*
+    @Override
+    public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Feature<?> feature = (Feature<?>) o;
         return Objects.equals(getFeatureName(), feature.getFeatureName()) && Objects.equals(getChildren(), feature.getChildren()) && getFeatureType() == feature.getFeatureType() && Objects.equals(getConstraints(), feature.getConstraints()); //Objects.equal(getExclusions(), feature.getExclusions()) && Objects.equal(getRequirements(), feature.getRequirements());
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getFeatureName(), getChildren(), getFeatureType(), getConstraints()); //getExclusions(), getRequirements());
-    }
-
-/*
     @Override
     public int hashCode() {
         return Objects.hashCode(getFeatureName(), getChildren(), parent, getExclusions(), getRequirements());
